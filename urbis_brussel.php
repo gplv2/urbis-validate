@@ -567,7 +567,7 @@ function search_street_node_deep($key, array $arr, $singlename = false, $flipped
         if ($lev) { 
             $levenshtein = Levenshtein($checkname,$key);
             logtrace(5,sprintf("[%s] - Levenshtein distance %d : '%s' vs '%s'",__METHOD__,$levenshtein,$key, $checkname, $key));
-            if ($levenshtein < 8) {
+            if ($levenshtein < 5) {
                 logtrace(4,sprintf("[%s] - (Levenshtein=%d) Minor differences detected between names  : '%s' vs '%s'",__METHOD__,$levenshtein,$key, $checkname, $key));
                 return($info); 
             }
