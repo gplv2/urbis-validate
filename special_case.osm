@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-11024' visible='true' lat='50.84839020123' lon='4.35598147756'>
+    <tag k='addr:city' v='Brussel - Bruxelles' />
+    <tag k='addr:city:fr' v='Bruxelles' />
+    <tag k='addr:city:nl' v='Brussel' />
+    <tag k='addr:country' v='BE' />
+    <tag k='addr:housenumber' v='71' />
+    <tag k='addr:postcode' v='1000' />
+    <tag k='addr:street' v='Rue de l&apos;Ecuyer - Schildknaapsstraat' />
+    <tag k='addr:street:fr' v='Rue de l&apos;Ecuyer' />
+    <tag k='addr:street:nl' v='Schildknaapsstraat' />
+    <tag k='ref:UrbIS' v='8187769' />
+  </node>
+  <node id='-11025' visible='true' lat='50.84884480278' lon='4.35467507756' />
+  <node id='-11026' visible='true' lat='50.84863090205' lon='4.35617377756'>
+    <tag k='addr:housenumber' v='50' />
+    <tag k='addr:street' v='Rue de l&apos;Ecuyer - Schildknaapsstraat' />
+    <tag k='ref:UrbIS' v='8188397' />
+  </node>
+  <node id='-11027' visible='true' lat='50.8484408014' lon='4.35620317756' />
+  <node id='-11028' visible='true' lat='50.84877160253' lon='4.35494187756' />
+  <node id='-11029' visible='true' lat='50.8486465021' lon='4.35539807756' />
+  <node id='-11030' visible='true' lat='50.84865310212' lon='4.35602007756'>
+    <tag k='addr:housenumber' v='48' />
+    <tag k='addr:street' v='Rue de l&apos;Ecuyer - Schildknaapsstraat' />
+    <tag k='ref:UrbIS' v='8188397' />
+  </node>
+  <way id='-11022' visible='true'>
+    <nd ref='-11025' />
+    <nd ref='-11028' />
+    <nd ref='-11029' />
+    <nd ref='-11027' />
+    <tag k='busway' v='lane' />
+    <tag k='cycleway' v='share_busway' />
+    <tag k='highway' v='residential' />
+    <tag k='maxspeed' v='30' />
+    <tag k='name' v='Rue de l&apos;Écuyer - Schildknaapsstraat' />
+    <tag k='name:fr' v='Rue de l&apos;Écuyer' />
+    <tag k='name:nl' v='Schildknaapsstraat' />
+    <tag k='oneway' v='yes' />
+    <tag k='surface' v='asphalt' />
+  </way>
+</osm>
