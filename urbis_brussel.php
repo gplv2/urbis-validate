@@ -191,6 +191,8 @@ if(isset($marray['way']['@attributes'] )) {
     $warra=$marray['way'];
 }
 
+unset($marray);
+
 $new_nodes=array();
 $new_ways=array();
 
@@ -222,6 +224,8 @@ foreach ($marra as $knode => $node) {
     }
     $new_nodes[$node_info['id']]['info']=$node_info;
 }
+
+unset($marra);
 //print_r($node_info);
 //print_r($node_tags);
 
@@ -249,6 +253,8 @@ foreach ($warra as $kway => $way) {
     $new_ways[$way_info['id']]['tags']=$way_tags;
     $new_ways[$way_info['id']]['info']=$way_info;
 }
+
+unset($warra);
 
 //print_r($new_nodes);exit;
 //print_r($new_ways);exit;
