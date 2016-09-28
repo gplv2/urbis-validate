@@ -65,8 +65,9 @@ http://overpass-turbo.eu/s/iDu
     <print mode="meta"/>
     </osm-script>fg
 
-Open with JOSM and save the osm, you can validate while editing in JOSM , run the validator
-    glenn@slicky:~/urbis/qa$ ./urbis_brussel.php -o addresses_brussel.osm
+Open with JOSM and save the osm, you can validate while editing in JOSM , run the validator: 
+
+`glenn@slicky:~/urbis/qa$ ./urbis_brussel.php -o addresses_brussel.osm`
 
 ## Output results (edited for reading)
 
