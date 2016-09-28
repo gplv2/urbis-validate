@@ -130,8 +130,8 @@ Chaussée de Louvain - Leuvense Steenweg vs.  Chaussée de Louvain - Leuvenseste
 
 Both are correct depending where it is.  Doublecheck the houses, they have it correct most of the times.  Check for borders using this Overpass query:
 
-{{key=boundary}}
-{{value=postal_code}}
+    {{key=boundary}}
+    {{value=postal_code}}
 
     <osm-script output="json">
         <query into="_" type="area">
@@ -153,7 +153,6 @@ Both are correct depending where it is.  Doublecheck the houses, they have it co
 In this example, the former is in 1210 - Saint-Josse-ten-Noode - Sint-Joost-ten-Node , the latter is in 1000 Bruxelles / Brussel
 
 Make sure you understand these subtle differences before making a change, often the streetname is the wrong one.
-
 
 ## suggestions
 
