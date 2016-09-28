@@ -150,7 +150,7 @@ Both are correct depending where it is.  Doublecheck the houses, they have it co
         <print mode="meta"/>
     </osm-script>
 
-In this example, the former is in 1210 - Saint-Josse-ten-Noode - Sint-Joost-ten-Node , the latter is in 1000 Bruxelles / Brussel
+In this example, the former is in Saint-Josse-ten-Noode / Sint-Joost-ten-Node , the latter is in 1000 Bruxelles / Brussel
 
 Make sure you understand these subtle differences before making a change, often the streetname is the wrong one.
 
