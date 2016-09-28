@@ -505,7 +505,10 @@ function search_street_node($key, array $arr, $case_sensitive = true){
                     return($info); 
                 }
             } else {
-                if (strcmp(strtolower($info['tags']['name']),strtolower($key))==0) {
+                $a=strtolower($info['tags']['name']);
+                $b=strtolower($key);
+                if (strcmp($a,$b)==0) {
+                    logtrace(2,sprintf("[%s] - md5 diff key/name :  %s vs %s ",__METHOD__, md5($key), md5($info['tags']['name'])));
                     return($info); 
                 }
             }

@@ -122,6 +122,39 @@ Open with JOSM and save the osm, you can validate while editing in JOSM , run th
 
 Now you can use JOSM to search for those ID's.  Nice example is [3261888514](http://www.openstreetmap.org/node/3261888514) , it's somewhere far away from the real location of this street.  I will not fix it. That is a hard error.  The rest has the suggested fix printed.
 
+## verification help
+
+You can user [this document](http://static.lexicool.com/dictionary/XD2MX714062.pdf) to check for spelling of the street names,  be aware that the streetname depends on municipality , especially the dutch one.  For example:
+
+Chaussée de Louvain - Leuvense Steenweg vs.  Chaussée de Louvain - Leuvensesteenweg
+
+Both are correct depending where it is.  Doublecheck the houses, they have it correct most of the times.  Check for borders using this Overpass query:
+
+{{key=boundary}}
+{{value=postal_code}}
+
+    <osm-script output="json">
+        <query into="_" type="area">
+            <bbox-query {{bbox}}/>
+            <has-kv k="name" modv="" v="België - Belgique - Belgien"/>
+        </query>
+        <union into="_">
+            <query type="relation">
+            <has-kv k="{{key}}" v="{{value}}"/>
+                <bbox-query {{bbox}}/>
+            </query>
+        </union>
+        <print from="_" limit="" mode="meta" order="id"/>
+        <print mode="meta"/>
+        <recurse type="down"/>
+        <print mode="meta"/>
+    </osm-script>
+
+In this example, the former is in 1210 - Saint-Josse-ten-Noode - Sint-Joost-ten-Node , the latter is in 1000 Bruxelles / Brussel
+
+Make sure you understand these subtle differences before making a change, often the streetname is the wrong one.
+
+
 ## suggestions
 
 I parsed a file until I catched all common errors, there might be a lot more.  The spelling is also checked with levenshtein distance check.  This catches a nasty problem I discoverd with utf8 encodings, so a few spelling mistakes
