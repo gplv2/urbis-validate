@@ -211,7 +211,6 @@ $new_nodes=array();
 $new_ways=array();
 
 // Extract OSM node information and build information array
-// print_r($marra);exit;
 logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
 foreach ($marra as $knode => $node) {
     $node_info=$node['@attributes'];
@@ -251,11 +250,20 @@ foreach ($w_arra as $kway => $way) {
     if(!isset($way_info)) {
         print_r($way);exit;
     }
-    if (!isset($way['tag'])) {
-        // This is probably a relation, skip support for this, the source is probably coming from josm dowload, not from overpass
+/*
+    if(isset($way['@attributes'] )) {
+        // This is probably a relation
+        print_r($way);exit;
         continue;
-        // print_r($way_info);exit;
+
+    } else
+*/
+    if (!isset($way['tag']) && count($way['nd'])) {
+        // No tags on this object but it has nodes , not interesting
+        // print_r($way);
+        continue;
     }
+
     $key= array_value_recursive('k', $way['tag']);
     $val= array_value_recursive('v', $way['tag']);
     if (is_string($key)) {
