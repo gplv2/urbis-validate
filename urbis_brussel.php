@@ -474,8 +474,8 @@ foreach($addresses as $k => $node) {
                         if (count($osm_info)) {
                             logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
                         } else {
-                            logtrace(1,sprintf("[%s] - Osm_id: %s - Missing matching street name %s.",__METHOD__,$osm_id, $node['tags']['addr:street']));
-                            logtrace(1,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
+                            logtrace(1,sprintf("[%s] - Verify Osm_id: [id:%s] - Missing matching street name '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
+                            logtrace(3,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                         }       
                     }
                 }
@@ -497,7 +497,7 @@ foreach($addresses as $k => $node) {
 
     if ($cnt % 3000 === 0)  {
         $sleep=200000;
-        logtrace(2,sprintf("[%s] - usleeping for %d (counter %d)",__METHOD__,$sleep, $cnt));
+        logtrace(3,sprintf("[%s] - usleeping for %d (counter %d)",__METHOD__,$sleep, $cnt));
         usleep($sleep);
    }
    $cnt++;
