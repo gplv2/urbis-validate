@@ -452,6 +452,7 @@ foreach($addresses as $k => $node) {
    $cnt++;
 }
 
+logtrace(1,sprintf("[%s] - Done",__METHOD__));
 exit;
 
 $output="";
