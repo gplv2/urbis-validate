@@ -368,6 +368,57 @@ if (isset($strt)) {
     }
 }
 
+/**
+* usort callback
+*/
+function name_compare($a, $b) {
+    $aname = $a['tags']['addr:street'];
+    $bname = $b['tags']['addr:street'];
+    
+    // Returns < 0 if str1 is less than str2; > 0 if str1 is greater than str2, and 0 if they are equal.
+    $res = strcmp($aname, $bname);
+    if ($res === 0) {
+        return 0;
+    } else if ($res < 0) {
+        return -1;
+    } else if ($res > 0) {
+        return 1;
+    }
+}
+
+logtrace(2,sprintf("[%s] - Sorting source addresses ...",__METHOD__));
+usort($addresses, "name_compare");
+
+
+logtrace(2,sprintf("[%s] - Done sorting",__METHOD__));
+
+/*
+Array
+(
+    [tags] => Array
+        (
+            [highway] => residential
+            [name] => Rue de l'Arbre Bénit - Gewijde-Boomstraat
+            [name:fr] => Rue de l'Arbre Bénit
+            [name:nl] => Gewijde-Boomstraat
+            [oneway] => yes
+        )
+
+    [info] => Array
+        (
+            [id] => 4726706
+            [timestamp] => 2016-02-27T16:26:12Z
+            [uid] => 383309
+            [user] => AtonX
+            [visible] => true
+            [version] => 16
+            [changeset] => 37484495
+        )
+
+)
+*/
+
+
 logtrace(2,sprintf("[%s] - Validating address data",__METHOD__));
 $cnt=0;
 foreach($addresses as $k => $node) {
@@ -424,7 +475,7 @@ foreach($addresses as $k => $node) {
                             logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
                         } else {
                             logtrace(1,sprintf("[%s] - Osm_id: %s - Missing matching street name %s.",__METHOD__,$osm_id, $node['tags']['addr:street']));
-                            logtrace(1,sprintf("[%s] - Verify this in JOSM using search on id:%s - This address might be very wrong  %s.",__METHOD__,$osm_id, $node['tags']['addr:street']));
+                            logtrace(1,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                         }       
                     }
                 }
