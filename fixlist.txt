@@ -21,3 +21,26 @@
 2016-09-30 00:57:54 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue Jean-André de Mot - Jean-André de Motstraat' [id:2119452193] vs. 'Rue Jean André de Mot - Jean André de Motstraat' [id:14363576]. (Fix the minor spell differences)
 2016-09-30 00:57:55 [17483]:[1]core  - [] - Verify Osm_id: [id:31500439] - Missing matching street name 'Rue Montagne de la Cour - Hofbergstraat'
 2016-09-30 00:57:58 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue d'Artois - Artesiestraat' [id:256376199] vs. 'Rue d'Artois - Artesiëstraat' [id:13767328]. (Fix the minor spell differences)
+2016-09-30 00:57:58 [17483]:[1]core  - [] - Verify Osm_id: [id:246604238] - Missing matching street name 'Rue de Groeninghe - Groeninghestraat'
+2016-09-30 00:57:59 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue de Pavie - Paviestraat' [id:485996359] vs. 'Rue de Pavie - Paviastraat' [id:14348109]. (Fix the minor spell differences)
+2016-09-30 00:58:01 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue de la Grande Ile - Grooteiland' [id:256119361] vs. 'Rue de la Grande Ile - Groot Eiland' [id:15497510]. (Fix the minor spell differences)
+2016-09-30 00:58:01 [17483]:[1]core  - [] - Verify Osm_id: [id:158830939] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 00:58:01 [17483]:[1]core  - [] - Verify Osm_id: [id:158830951] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 00:58:01 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue de la Régence - Regentsschapsstraat' [id:1721648161] vs. 'Rue de la Régence - Regentschapsstraat' [id:307580163]. (Fix the minor spell differences)
+2016-09-30 00:58:02 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue des Fabriques - Fabriekstraat' [id:1215882527] vs. 'Rue des Fabriques - Fabrieksstraat' [id:13251630]. (Fix the minor spell differences)
+2016-09-30 00:58:03 [17483]:[1]core  - [] - Verify Osm_id: [id:2659564252] - Missing matching street name 'Rue des Quatre Bras - Quatre Brasstraat'
+2016-09-30 00:58:03 [17483]:[1]core  - [] - Verify Osm_id: [id:2659563815] - Missing matching street name 'Rue des Quatre Bras - Quatre Brasstraat'
+2016-09-30 00:58:03 [17483]:[1]core  - [] - Verify Osm_id: [id:260473894] - Missing matching street name 'Rue des Quatre Bras - Quatre Brasstraat'
+2016-09-30 00:58:03 [17483]:[1]core  - [] - Verify Osm_id: [id:2659562809] - Missing matching street name 'Rue des Quatre Bras - Quatre Brasstraat'
+2016-09-30 00:58:03 [17483]:[1]core  - [] - Verify Osm_id: [id:2659562849] - Missing matching street name 'Rue des Quatre Bras - Quatre Brasstraat'
+2016-09-30 00:58:03 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue des Quatre-Vents - Vierwindenstraat' [id:31133103] vs. 'Rue des Quatre Vents - Vierwindenstraat' [id:25449843]. (Fix the minor spell differences)
+2016-09-30 00:58:04 [17483]:[1]core  - [] - Verify Osm_id: [id:235893531] - Missing matching street name 'Rue du Brochet - Snoekstraat'
+2016-09-30 00:58:05 [17483]:[1]core  - [] - Verify Osm_id: [id:239464463] - Missing matching street name 'Rue du Noyer - Notelaarsstraat'
+2016-09-30 00:58:05 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue du Sceptre - Skepterstraat' [id:2357796916] vs. 'Rue du Sceptre - Scepterstraat' [id:16233798]. (Fix the minor spell differences)
+2016-09-30 00:58:05 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Rue d’Arlon - Aarlenstraat' [id:138300520] vs. 'Rue d'Arlon - Aarlenstraat' [id:13430372]. (Fix the minor spell differences)
+2016-09-30 00:58:05 [17483]:[2]info  - [] - Found deep scan match (levenshtein) 'Square Frère Orban - Frère-Orbansquare' [id:71285641] vs. 'Square Frère-Orban - Frère-Orbansquare' [id:17080335]. (Fix the minor spell differences)
+2016-09-30 00:58:05 [17483]:[1]core  - [] - Verify Osm_id: [id:2640981033] - Missing matching street name 'Square Sainctelette - Sainctelettesquare'
+2016-09-30 00:58:06 [17483]:[1]core  - [] - Verify Osm_id: [id:158832998] - Missing matching street name 'Stefaniaplein'
+2016-09-30 00:58:06 [17483]:[2]info  - [] - Found lowercase match (case problem) 'boulevard Anspach - Anspachlaan' [id:74034262] vs. 'Boulevard Anspach - Anspachlaan' [id:12351894]. (Fix the spelling)
+2016-09-30 00:58:06 [17483]:[2]info  - [] - Found lowercase match (case problem) 'rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:225746349] vs. 'Rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:13855129]. (Fix the spelling)
+2016-09-30 00:58:06 [17483]:[1]core  - [] - Done
