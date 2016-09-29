@@ -116,6 +116,7 @@ $cur_dir = realpath(".");
 
 if (isset($options['auto']))  {
     /* Now load the Overpass XML */
+    logtrace(2,sprintf("[%s] - Auto mode (at your risk)",__METHOD__));
     $ch = curl_init();
 
     $settings= array(
@@ -174,30 +175,44 @@ if (isset($options['auto']))  {
 if (!file_exists($osmfile)) { die("File $osmfile not found"); }
 
 // Load up JOSM / Overpass xml
+logtrace(2,sprintf("[%s] - Loading %s",__METHOD__, $osmfile));
 $xml = simplexml_load_file($osmfile);
+logtrace(2,sprintf("[%s] - Loading done : %s Mb",__METHOD__, round(filesize($osmfile)/1024/1024)));
+logtrace(2,sprintf("[%s] - Decoding ... ",__METHOD__));
 $marray=(json_decode(json_encode((array) $xml), 1));
+logtrace(2,sprintf("[%s] - Decoding Done",__METHOD__));
+
+// Clear up mem
+$xml= null; unset ($xml);
+if(gc_enabled()) gc_collect_cycles();
+
+// var_dump(gc_enabled()); 
+// ini_set('zend.enable_gc', 0); 
+// var_dump(gc_enabled()); 
 
 
 $marra=$marray['node'];
 // print_r($marray['way']);exit;
 
 // Handle single street / addr node situations
-logtrace(3,sprintf("[%s] - Check street array",__METHOD__));
-
+logtrace(2,sprintf("[%s] - Check validity of street data",__METHOD__));
 if(isset($marray['way']['@attributes'] )) {
-    logtrace(3,sprintf("[%s] - fixing street array",__METHOD__));
-    $warra=array($marray['way']);
+    logtrace(2,sprintf("[%s] - fixing street array",__METHOD__));
+    $w_arra=array($marray['way']);
 } else {
-    $warra=$marray['way'];
+    $w_arra=$marray['way'];
 }
+logtrace(2,sprintf("[%s] - OK",__METHOD__));
 
-unset($marray);
+$marray = null ; unset($marray);
+if(gc_enabled()) gc_collect_cycles();
 
 $new_nodes=array();
 $new_ways=array();
 
 // Extract OSM node information and build information array
 // print_r($marra);exit;
+logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
 foreach ($marra as $knode => $node) {
     $node_info=$node['@attributes'];
     $break=0;
@@ -225,11 +240,13 @@ foreach ($marra as $knode => $node) {
     $new_nodes[$node_info['id']]['info']=$node_info;
 }
 
-unset($marra);
+$marra = null ; unset($marra);
+if(gc_enabled()) gc_collect_cycles();
 //print_r($node_info);
 //print_r($node_tags);
 
-foreach ($warra as $kway => $way) {
+logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
+foreach ($w_arra as $kway => $way) {
     $way_info=$way['@attributes'];
     if(!isset($way_info)) {
         print_r($way);exit;
@@ -254,15 +271,15 @@ foreach ($warra as $kway => $way) {
     $new_ways[$way_info['id']]['info']=$way_info;
 }
 
-unset($warra);
+$w_arra = null ; unset($w_arra);
+if(gc_enabled()) gc_collect_cycles();
 
 //print_r($new_nodes);exit;
 //print_r($new_ways);exit;
 
-$streets = array();
 $addresses = array();
-
-// Extract addresses / aka streets from nodes
+// Extract addresses / aka streets from nodes and ways
+logtrace(2,sprintf("[%s] - Extracting address data from nodes",__METHOD__));
 foreach($new_nodes as $k => $node) {
     if (!isset($node['tags'])) {
         logtrace(4,sprintf("[%s] - skipping empty tag node '%s'",__METHOD__,$node['info']['id']));
@@ -290,8 +307,15 @@ foreach($new_nodes as $k => $node) {
     }
 }
 
+// Sleep 2 - Laptop getting hot on huge files
+sleep(2);
 
+$new_nodes = null ; unset($new_nodes);
+if(gc_enabled()) gc_collect_cycles();
+
+$streets = array();
 // Extract addresses / aka streets from ways
+logtrace(2,sprintf("[%s] - Extracting address data from ways",__METHOD__));
 foreach($new_ways as $k => $way) {
     if (!isset($way['tags'])) {
         logtrace(4,sprintf("[%s] - skipping empty tag way '%s'",__METHOD__,$way['info']['id']));
@@ -304,6 +328,7 @@ foreach($new_ways as $k => $way) {
     if (!isset($way['tags']['addr:street']) && isset($way['tags']['highway']) && isset($way['tags']['name'])) {
         // way is a street with a name (should exist for ways, we need this)
         logtrace(3,sprintf("[%s] - way has good data with name '%s' - %s",__METHOD__,$way['info']['id'], $way['tags']['name']));
+        // print_r($way);sleep(1);
         $streets[]=$way;
     }
     if (isset($way['tags']['addr:street']) && !isset($way['tags']['highway'])) {
@@ -312,6 +337,12 @@ foreach($new_ways as $k => $way) {
         $addresses[]=$way;
     }
 }
+
+// Sleep 2 - Laptop getting hot on huge files
+sleep(2);
+
+$new_ways = null ; unset($new_ways);
+if(gc_enabled()) gc_collect_cycles();
 
 $mod_nodes=array();
 
@@ -325,6 +356,7 @@ if (!$streets) {
 
 // print_r($streets);exit;
 // For presentation reasons, quick sorted list:
+logtrace(2,sprintf("[%s] - Extracting street list data",__METHOD__));
 foreach($streets as $k => $v ) {
     $strt[]=$v['tags']['name'];
 }
@@ -336,6 +368,8 @@ if (isset($strt)) {
     }
 }
 
+logtrace(2,sprintf("[%s] - Validating address data",__METHOD__));
+$cnt=0;
 foreach($addresses as $k => $node) {
     logtrace(4,sprintf("[%s] - Checking address %s",__METHOD__,$k));
     if(isset($node['info']['id'])) {
@@ -408,6 +442,14 @@ foreach($addresses as $k => $node) {
         }
     // print_r($node);exit;
     }
+    //logtrace(2,sprintf("[%s] - counter %d",__METHOD__,$cnt));
+
+    if ($cnt % 3000 === 0)  {
+        $sleep=200000;
+        logtrace(2,sprintf("[%s] - usleeping for %d (counter %d)",__METHOD__,$sleep, $cnt));
+        usleep($sleep);
+   }
+   $cnt++;
 }
 
 exit;
@@ -486,7 +528,7 @@ function array_value_recursive($key, array $arr){
     return count($val) > 1 ? $val : array_pop($val);
 }
 
-function search_node($key, array $arr){
+function search_node($key, array &$arr){
     logtrace(3,sprintf("[%s] - Searching for ref street in ways %s .. ",__METHOD__,$key));
     print_r($key);exit;
 
@@ -500,7 +542,7 @@ function search_node($key, array $arr){
     return array();
 }
 
-function search_street_node($key, array $arr, $case_sensitive = true){
+function search_street_node($key, array &$arr, $case_sensitive = true){
     logtrace(5,sprintf("[%s] - Searching for ref street in street ways %s .. ",__METHOD__,$key));
     // print_r($key);exit;
 
@@ -514,7 +556,7 @@ function search_street_node($key, array $arr, $case_sensitive = true){
                 $a=strtolower($info['tags']['name']);
                 $b=strtolower($key);
                 if (strcmp($a,$b)==0) {
-                    logtrace(2,sprintf("[%s] - md5 diff key/name :  %s vs %s ",__METHOD__, md5($key), md5($info['tags']['name'])));
+                    logtrace(4,sprintf("[%s] - md5 check key/name :  %s vs %s ",__METHOD__, md5($a), md5($b)));
                     return($info); 
                 }
             }
@@ -522,7 +564,7 @@ function search_street_node($key, array $arr, $case_sensitive = true){
     }
     return array();
 }
-function search_street_node_deep($key, array $arr, $singlename = false, $flipped = false, $lev = false){
+function search_street_node_deep($key, array &$arr, $singlename = false, $flipped = false, $lev = false){
     logtrace(5,sprintf("[%s] - Searching for name:nl/name:fr street in street ways %s .. ",__METHOD__,$key));
     // print_r($key);exit;
     
