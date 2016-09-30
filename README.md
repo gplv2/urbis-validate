@@ -170,7 +170,11 @@ Both exist but in reality it's only 1 way [430855719](https://www.openstreetmap.
 ### 6618925
 ![alt text][rel6]
 
+### Boundary
+![alt text][border1]
+
 In the direction of the way, on your left you have 1050 / Ixelles - Elsene and on your right side 1000 / Bruxelles - Brussel 
+
 
 ![alt text][toren2]
 
@@ -191,4 +195,5 @@ I parsed a file until I catched all common errors, there might be a lot more.  T
 [molen1]: https://github.com/gplv2/urbis-validate/raw/master/docs/molenheide.png "Molenheidebaan - Trianondreef"
 [rel3]: https://github.com/gplv2/urbis-validate/raw/master/docs/rel3234845.png "Relation 3234845"
 [rel6]: https://github.com/gplv2/urbis-validate/raw/master/docs/rel6618925.png "Relation 6618925"
+[border1]: https://github.com/gplv2/urbis-validate/raw/master/docs/borders.png "Border Ixelles/Bruxelles"
 
