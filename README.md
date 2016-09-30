@@ -63,7 +63,7 @@ http://overpass-turbo.eu/s/iDu
     <print mode="meta"/>
     <recurse type="down"/>
     <print mode="meta"/>
-    </osm-script>fg
+    </osm-script>
 
 Open with JOSM and save the osm, you can validate while editing in JOSM , run the validator: 
 
