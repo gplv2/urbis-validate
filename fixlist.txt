@@ -1,27 +1,27 @@
-2016-09-30 03:00:54 [6113]:[2]info  - [] - Loading addresses_brussel.osm
-2016-09-30 03:00:55 [6113]:[2]info  - [] - Loading done : 41 Mb
-2016-09-30 03:00:55 [6113]:[2]info  - [] - Decoding ... 
-2016-09-30 03:01:00 [6113]:[2]info  - [] - Decoding Done
-2016-09-30 03:01:01 [6113]:[2]info  - [] - Check validity of street data
-2016-09-30 03:01:01 [6113]:[2]info  - [] - OK
-2016-09-30 03:01:02 [6113]:[2]info  - [] - Extracting xml formatted node data 
-2016-09-30 03:01:03 [6113]:[2]info  - [] - Extracting xml formatted way data 
-2016-09-30 03:01:04 [6113]:[2]info  - [] - Extracting address data from nodes
-2016-09-30 03:01:07 [6113]:[2]info  - [] - Extracting address data from ways
-2016-09-30 03:01:10 [6113]:[2]info  - [] - Extracting street list data
-2016-09-30 03:01:10 [6113]:[2]info  - [] - Sorting source addresses ...
-2016-09-30 03:01:11 [6113]:[2]info  - [] - Done sorting
-2016-09-30 03:01:11 [6113]:[2]info  - [] - Validating address data
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830947] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830950] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830946] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830939] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830951] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830941] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:23 [6113]:[1]core  - [] - Verify Osm_id: [id:158830953] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:24 [6113]:[1]core  - [] - Verify Osm_id: [id:158830967] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:24 [6113]:[1]core  - [] - Verify Osm_id: [id:158830960] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:24 [6113]:[1]core  - [] - Verify Osm_id: [id:158830968] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:24 [6113]:[1]core  - [] - Verify Osm_id: [id:158830957] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:24 [6113]:[1]core  - [] - Verify Osm_id: [id:158830954] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 03:01:27 [6113]:[1]core  - [] - Done
+2016-09-30 13:43:33 [16718]:[2]info  - [] - Loading addresses_brussel.osm
+2016-09-30 13:43:35 [16718]:[2]info  - [] - Loading done : 41 Mb
+2016-09-30 13:43:35 [16718]:[2]info  - [] - Decoding ... 
+2016-09-30 13:43:41 [16718]:[2]info  - [] - Decoding Done
+2016-09-30 13:43:43 [16718]:[2]info  - [] - Check validity of street data
+2016-09-30 13:43:43 [16718]:[2]info  - [] - OK
+2016-09-30 13:43:43 [16718]:[2]info  - [] - Extracting xml formatted node data 
+2016-09-30 13:43:44 [16718]:[2]info  - [] - Extracting xml formatted way data 
+2016-09-30 13:43:45 [16718]:[2]info  - [] - Extracting address data from nodes
+2016-09-30 13:43:48 [16718]:[2]info  - [] - Extracting address data from ways
+2016-09-30 13:43:51 [16718]:[2]info  - [] - Extracting street list data
+2016-09-30 13:43:51 [16718]:[2]info  - [] - Sorting source addresses ...
+2016-09-30 13:43:52 [16718]:[2]info  - [] - Done sorting
+2016-09-30 13:43:52 [16718]:[2]info  - [] - Validating address data
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830947] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830950] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830946] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830939] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830951] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:04 [16718]:[1]core  - [] - Verify Osm_id: [id:158830941] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830953] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830967] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830960] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830968] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830957] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:05 [16718]:[1]core  - [] - Verify Osm_id: [id:158830954] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 13:44:08 [16718]:[1]core  - [] - Done

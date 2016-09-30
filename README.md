@@ -12,7 +12,16 @@ highways having a name
  - single streetnames in highways
  - non-matching streets vs addressed objects
 
-Specifically made for Brussels
+Specifically made for Brussels.
+
+## what it does
+
+ - identifies street names of objects that do not match the name of a highway
+ - identifies spelling mistakes if no match between the above
+ - identifies umatched object addresses
+ - identifies order of name (fr - nl)
+ 
+Meant to be used while working in JOSM on the osm save file (read only).  Works with relations, ways and nodes.
 
 ## Usage
 
