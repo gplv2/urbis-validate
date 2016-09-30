@@ -174,7 +174,7 @@ In the direction of the way, on your left you have 1050 / Ixelles - Elsene and o
 
 ![alt text][toren2]
 
-The common way `name:left` and `name:right` doesn't make a change but I find this awkward since we already use `name:nl` and `name:fr`.   Then there is the problem with the format of `name` itself.  Usually when a road has 2 names, both names also go into this field with a dash.  Example of this: way[16752454](https://www.openstreetmap.org/way/16752454/)
+The common way `name:left` and `name:right` doesn't make a change but I find this awkward since we already use `name:nl` and `name:fr`.   Then there is the problem with the format of `name` itself.  Usually when a road has 2 names, both names also go into this field with a dash.  Example of this: way [Molenheidebaan - Trianondreef id:16752454](https://www.openstreetmap.org/way/16752454/)
 
 ![alt text][molen1]
 
