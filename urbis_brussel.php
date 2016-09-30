@@ -20,7 +20,7 @@ $cliargs= array(
          ),
       'osm' => array(
          'short' => 'o',
-         'type' => 'optional',
+         'type' => 'required',
          'description' => "The name of the OSM file parse the XML from.",
          'default' => ''
          ),
