@@ -152,10 +152,33 @@ Both are correct depending where it is.  Doublecheck the houses, they have it co
 
 In this example, the former is in Saint-Josse-ten-Noode / Sint-Joost-ten-Node , the latter is in 1000 Bruxelles / Brussel
 
-Make sure you understand these subtle differences before making a change, often the streetname is the wrong one.
+Make sure you understand these subtle differences before making a change, often the streetname is the wrong one.  You can easily copy/paste the id:number format (ex. [id:8511786] ). This JOSM search syntax (press ctrl-F).  You need to verify street name spelling to know how to correct it.  Ex. Search for `name:"Arenberg"` in JOSM to find all streets with `Arenberg` in it.  For adddressed nodes search , search for `"addr:street":"Arenberg"`.  Mass edit the mistakes like this but make sure to narrow the search down.  It's gready so sometimes it will for example grab `Place, Rue, Boulevard Arenberg` alltogether.
+
+Sometimes the fix is in the street and/or associated relations, other times it's in the addressed objects.
+
+## Problematic street
+
+There is an issue with 'Rue de la Grosse Tour - Wollendriestoren' vs. 'Rue de la Grosse Tour - Wollendriestorenstraat'. 
+
+![alt text][toren1]
+
+Both exist but in reality it's only 1 way [430855719](https://www.openstreetmap.org/way/430855719).  So we lack a street right now, building addresses can not match one if them.  JOSM validator doesn't like the second associated street I made to indicate this.  The way is now part of 2 associations: [3234845](https://www.openstreetmap.org/relation/3234845) and [6618925](https://www.openstreetmap.org/relation/6618925) , so this was to be expected.  In the direction of the way, on your left you have 1050 / Ixelles - Elsene and on your right side 1000 / Bruxelles - Brussel 
+
+![alt text][toren2]
+
+The common way `name:left` and `name:right` doesn't make a change but I find this awkward since we already use `name:nl` and `name:fr`.   Then there is the problem with the format of `name` itself.  Usually when a road has 2 names, both names also go into this field with a dash.  Example of this: way[16752454](https://www.openstreetmap.org/way/16752454/)
+
+![alt text][molen1]
+
+If anyone has a good idea how to solve such an issue, please send feedback.
 
 ## suggestions
 
 I parsed a file until I catched all common errors, there might be a lot more.  The spelling is also checked with levenshtein distance check.  This catches a nasty problem I discoverd with utf8 encodings, so a few spelling mistakes
 
 ##
+
+[toren1]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/torenstraat1.png "Rue de la Grosse Tour - Wollendriestoren"
+[toren2]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/torenstraat2.png "Rue de la Grosse Tour - Wollendriestorenstraat"
+[molen1]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/molenheide.png "Molenheidebaan - Trianondreef"
+
