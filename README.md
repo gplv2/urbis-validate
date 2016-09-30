@@ -162,7 +162,15 @@ There is an issue with 'Rue de la Grosse Tour - Wollendriestoren' vs. 'Rue de la
 
 ![alt text][toren1]
 
-Both exist but in reality it's only 1 way [430855719](https://www.openstreetmap.org/way/430855719).  So we lack a street right now, building addresses can not match one if them.  JOSM validator doesn't like the second associated street I made to indicate this.  The way is now part of 2 associations: [3234845](https://www.openstreetmap.org/relation/3234845) and [6618925](https://www.openstreetmap.org/relation/6618925) , so this was to be expected.  In the direction of the way, on your left you have 1050 / Ixelles - Elsene and on your right side 1000 / Bruxelles - Brussel 
+Both exist but in reality it's only 1 way [430855719](https://www.openstreetmap.org/way/430855719).  So we lack a street right now, building addresses can not match one if them.  JOSM validator doesn't like the second associated street I made to indicate this.  The way is now part of 2 associations: [3234845](https://www.openstreetmap.org/relation/3234845) and [6618925](https://www.openstreetmap.org/relation/6618925) , so this was to be expected.  
+
+### 3234845
+![alt text][rel3]
+
+### 6618925
+![alt text][rel6]
+
+In the direction of the way, on your left you have 1050 / Ixelles - Elsene and on your right side 1000 / Bruxelles - Brussel 
 
 ![alt text][toren2]
 
@@ -181,4 +189,6 @@ I parsed a file until I catched all common errors, there might be a lot more.  T
 [toren1]: https://github.com/gplv2/urbis-validate/raw/master/docs/torenstraat1.png "Rue de la Grosse Tour - Wollendriestoren"
 [toren2]: https://github.com/gplv2/urbis-validate/raw/master/docs/torenstraat2.png "Rue de la Grosse Tour - Wollendriestorenstraat"
 [molen1]: https://github.com/gplv2/urbis-validate/raw/master/docs/molenheide.png "Molenheidebaan - Trianondreef"
+[rel3]: https://github.com/gplv2/urbis-validate/raw/master/docs/rel3234845.png "Relation 3234845"
+[rel6]: https://github.com/gplv2/urbis-validate/raw/master/docs/rel6618925.png "Relation 6618925"
 
