@@ -178,7 +178,7 @@ I parsed a file until I catched all common errors, there might be a lot more.  T
 
 ##
 
-[toren1]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/torenstraat1.png "Rue de la Grosse Tour - Wollendriestoren"
-[toren2]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/torenstraat2.png "Rue de la Grosse Tour - Wollendriestorenstraat"
-[molen1]: https://github.com/gplv2/urbis-validate/raw/master/docs/docs/molenheide.png "Molenheidebaan - Trianondreef"
+[toren1]: https://github.com/gplv2/urbis-validate/raw/master/docs/torenstraat1.png "Rue de la Grosse Tour - Wollendriestoren"
+[toren2]: https://github.com/gplv2/urbis-validate/raw/master/docs/torenstraat2.png "Rue de la Grosse Tour - Wollendriestorenstraat"
+[molen1]: https://github.com/gplv2/urbis-validate/raw/master/docs/molenheide.png "Molenheidebaan - Trianondreef"
 
