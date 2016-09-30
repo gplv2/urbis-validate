@@ -1,30 +1,66 @@
-2016-09-30 02:53:43 [5986]:[2]info  - [] - Loading addresses_brussel.osm
-2016-09-30 02:53:44 [5986]:[2]info  - [] - Loading done : 41 Mb
-2016-09-30 02:53:44 [5986]:[2]info  - [] - Decoding ... 
-2016-09-30 02:53:49 [5986]:[2]info  - [] - Decoding Done
-2016-09-30 02:53:50 [5986]:[2]info  - [] - Check validity of street data
-2016-09-30 02:53:50 [5986]:[2]info  - [] - OK
-2016-09-30 02:53:50 [5986]:[2]info  - [] - Extracting xml formatted node data 
-2016-09-30 02:53:51 [5986]:[2]info  - [] - Extracting xml formatted way data 
-2016-09-30 02:53:52 [5986]:[2]info  - [] - Extracting address data from nodes
-2016-09-30 02:53:56 [5986]:[2]info  - [] - Extracting address data from ways
-2016-09-30 02:53:58 [5986]:[2]info  - [] - Extracting street list data
-2016-09-30 02:53:58 [5986]:[2]info  - [] - Sorting source addresses ...
-2016-09-30 02:53:59 [5986]:[2]info  - [] - Done sorting
-2016-09-30 02:53:59 [5986]:[2]info  - [] - Validating address data
-2016-09-30 02:54:00 [5986]:[1]core  - [] - Verify Osm_id: [id:143744297] - Missing matching street name 'Boulevard Léopold II - Leopold II-Laan'
-2016-09-30 02:54:10 [5986]:[1]core  - [] - Verify Osm_id: [id:158830953] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830954] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830957] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830967] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830960] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830951] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830941] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830939] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:11 [5986]:[1]core  - [] - Verify Osm_id: [id:158830946] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:12 [5986]:[1]core  - [] - Verify Osm_id: [id:158830947] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:12 [5986]:[1]core  - [] - Verify Osm_id: [id:158830950] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:12 [5986]:[1]core  - [] - Verify Osm_id: [id:158830968] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
-2016-09-30 02:54:15 [5986]:[2]info  - [] - Found lowercase match (case problem) 'boulevard Anspach - Anspachlaan' [id:74034262] vs. 'Boulevard Anspach - Anspachlaan' [id:12351894]. (Fix the spelling)
-2016-09-30 02:54:15 [5986]:[2]info  - [] - Found lowercase match (case problem) 'rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:225746349] vs. 'Rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:13855129]. (Fix the spelling)
-2016-09-30 02:54:15 [5986]:[1]core  - [] - Done
+2016-09-30 02:56:02 [6046]:[2]info  - [] - Loading addresses_brussel.osm
+2016-09-30 02:56:03 [6046]:[2]info  - [] - Loading done : 41 Mb
+2016-09-30 02:56:03 [6046]:[2]info  - [] - Decoding ... 
+2016-09-30 02:56:08 [6046]:[2]info  - [] - Decoding Done
+2016-09-30 02:56:10 [6046]:[2]info  - [] - Check validity of street data
+2016-09-30 02:56:10 [6046]:[2]info  - [] - OK
+2016-09-30 02:56:10 [6046]:[2]info  - [] - Extracting xml formatted node data 
+2016-09-30 02:56:11 [6046]:[2]info  - [] - Extracting xml formatted way data 
+2016-09-30 02:56:12 [6046]:[2]info  - [] - Extracting address data from nodes
+2016-09-30 02:56:16 [6046]:[2]info  - [] - Extracting address data from ways
+2016-09-30 02:56:18 [6046]:[2]info  - [] - Extracting street list data
+2016-09-30 02:56:18 [6046]:[2]info  - [] - Sorting source addresses ...
+2016-09-30 02:56:19 [6046]:[2]info  - [] - Done sorting
+2016-09-30 02:56:19 [6046]:[2]info  - [] - Validating address data
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061486] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531688] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061485] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531685] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061462] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531684] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531686] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531687] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531699] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061481] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:21 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061470] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531695] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531696] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531698] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531697] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531694] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531693] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531701] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531690] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531700] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531691] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:22 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531692] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:243531689] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061435] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:2509237886] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061419] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:2509237831] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:2509237828] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:2509237826] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:2509237827] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061425] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061457] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:23 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061450] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:24 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061434] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:24 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061454] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:24 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061433] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:24 [6046]:[2]info  - [] - Found deep scan match (levenshtein) 'Boulevard Léopold II - Leopold II laan' [id:166061456] vs. 'Boulevard Léopold II - Leopold II-laan' [id:14333994]. (Fix the minor spell differences)
+2016-09-30 02:56:34 [6046]:[1]core  - [] - Verify Osm_id: [id:158830939] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:34 [6046]:[1]core  - [] - Verify Osm_id: [id:158830954] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830967] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830960] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830957] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830950] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830968] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830947] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:35 [6046]:[1]core  - [] - Verify Osm_id: [id:158830951] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:36 [6046]:[1]core  - [] - Verify Osm_id: [id:158830941] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:36 [6046]:[1]core  - [] - Verify Osm_id: [id:158830946] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:36 [6046]:[1]core  - [] - Verify Osm_id: [id:158830953] - Missing matching street name 'Rue de la Grosse Tour - Wollendriestoren'
+2016-09-30 02:56:39 [6046]:[2]info  - [] - Found lowercase match (case problem) 'boulevard Anspach - Anspachlaan' [id:74034262] vs. 'Boulevard Anspach - Anspachlaan' [id:12351894]. (Fix the spelling)
+2016-09-30 02:56:39 [6046]:[2]info  - [] - Found lowercase match (case problem) 'rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:225746349] vs. 'Rue du Gouvernement Provisoire - Voorlopig Bewindstraat' [id:13855129]. (Fix the spelling)
+2016-09-30 02:56:39 [6046]:[1]core  - [] - Done
