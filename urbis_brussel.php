@@ -642,7 +642,7 @@ function search_street_node($key, array &$arr, $case_sensitive = true){
             if (strcmp($info['tags']['name'],$named_combo)==0) {
                 logtrace(4,sprintf("[%s] - Both name:fr and name:nl match the name '%s' (combined at - )",__METHOD__,$named_combo));
             } else {
-                logtrace(2,sprintf("[%s] - There is a difference between 'name:fr - name:nl' vs. the name:'%s' <> '%s'",__METHOD__,$named_combo, $info['tags']['name']));
+                logtrace(2,sprintf("[%s] - Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$named_combo, $info['tags']['name']));
             }
         }
     }
