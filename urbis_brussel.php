@@ -359,6 +359,21 @@ foreach($new_ways as $k => $way) {
         logtrace(3,sprintf("[%s] - way has good data with addr:street '%s' - %s",__METHOD__,$way['info']['id'], $way['tags']['addr:street']));
         $addresses[]=$way;
     }
+
+    // print_r($way);
+
+    /* Check name:fr + name:nl = name */
+    if (!empty($way['tags']['name:fr']) && !empty($way['tags']['name:nl'])) {
+        $named_combo=sprintf("%s - %s", $way['tags']['name:fr'], $way['tags']['name:nl']);
+        if (strcmp($way['tags']['name'],$named_combo)==0) {
+            logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['info']['id'],$named_combo));
+        } else {
+            // $osm_info['info']['id']
+            logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['info']['id'], $named_combo, $way['tags']['name']));
+        }
+    } else {
+    //print_r($node);exit;
+    }
 }
 
 // Sleep 2 - Laptop getting hot on huge files
@@ -454,7 +469,21 @@ foreach($addresses as $k => $node) {
     }
     // echo PHP_EOL;
     //if(!isset($node['id']) && isset($node['name'])) 
-        //logtrace(4,sprintf("[%s] - Parsing features ref '%s'",__METHOD__,$node['name']));
+    //logtrace(4,sprintf("[%s] - Parsing features ref '%s'",__METHOD__,$node['name']));
+
+    /* Check name:fr + name:nl = name */
+    if (!empty($node['tags']['name:fr']) && !empty($node['tags']['name:nl'])) {
+        $named_combo=sprintf("%s - %s", $node['tags']['name:fr'], $node['tags']['name:nl']);
+        if (strcmp($node['tags']['name'],$named_combo)==0) {
+            logtrace(1,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$node['info']['id'],$named_combo));
+        } else {
+            // $osm_info['info']['id']
+            logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$node['info']['id'], $named_combo, $node['tags']['name']));
+        }
+    } else {
+    //print_r($node);exit;
+    }
+
     if(isset($osm_id) && isset($node['tags']['addr:street'])) { 
         logtrace(4,sprintf("[%s] - Check if street exists '%s'",__METHOD__,$node['tags']['addr:street']));
         $osm_info = search_street_node($node['tags']['addr:street'], $streets);
@@ -634,15 +663,6 @@ function search_street_node($key, array &$arr, $case_sensitive = true){
                     logtrace(4,sprintf("[%s] - md5 check key/name :  %s vs %s ",__METHOD__, md5($a), md5($b)));
                     return($info); 
                 }
-            }
-        }
-        /* Check name:fr + name:nl = name */
-        if (!empty($info['tags']['name:fr']) && !empty($info['tags']['name:nl'])) {
-            $named_combo=sprintf("%s - %s", $info['tags']['name:fr'], $info['tags']['name:nl']);
-            if (strcmp($info['tags']['name'],$named_combo)==0) {
-                logtrace(4,sprintf("[%s] - Both name:fr and name:nl match the name '%s' (combined at - )",__METHOD__,$named_combo));
-            } else {
-                logtrace(2,sprintf("[%s] - Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$named_combo, $info['tags']['name']));
             }
         }
     }
