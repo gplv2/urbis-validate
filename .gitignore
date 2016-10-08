@@ -1,3 +1,4 @@
 changes.txt
 *.swp
 *.osm
+vendor/
