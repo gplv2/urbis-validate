@@ -475,7 +475,7 @@ foreach($addresses as $k => $node) {
     if (!empty($node['tags']['name:fr']) && !empty($node['tags']['name:nl'])) {
         $named_combo=sprintf("%s - %s", $node['tags']['name:fr'], $node['tags']['name:nl']);
         if (strcmp($node['tags']['name'],$named_combo)==0) {
-            logtrace(1,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$node['info']['id'],$named_combo));
+            logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$node['info']['id'],$named_combo));
         } else {
             // $osm_info['info']['id']
             logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$node['info']['id'], $named_combo, $node['tags']['name']));
