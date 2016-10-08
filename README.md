@@ -2,6 +2,11 @@
 
 Install PHP first
 
+# Read 
+
+ - https://wiki.openstreetmap.org/wiki/Multilingual_names#Brussels
+ - https://wiki.openstreetmap.org/wiki/Names
+
 ## Q/A checks based on adddr:street vs name
 
 For nodes/ways containing : addr:street and
