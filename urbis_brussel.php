@@ -299,15 +299,29 @@ foreach($new_nodes as $k => $node) {
         continue;
     }
     if (!isset($node['tags']['addr:street']) && isset($node['tags']['highway']) && isset($node['tags']['name'])) {
-        // node is a street with a name (should not exist)
-        logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['info']['id']));
-        exit(1); 
+        // if ($node['tags']['highway']=='crossing') 
+            //Skip named crossing
+        switch ($node['tags']['highway']) {
+            case 'crossing':
+                continue;
+                break;
+            case 'bus_stop':
+                continue;
+                break;
+            default:
+                echo "i equals 2";
+                // node is a street with a name (should not exist)
+                logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['info']['id']));
+                print_r($node);
+                exit(1); 
+                break;
+        }
     }
     if (isset($node['tags']['addr:street']) && !isset($node['tags']['highway'])) {
         // node has good address information, we will check this
         logtrace(3,sprintf("[%s] - node has good data with addr:street '%s' - %s",__METHOD__,$node['info']['id'], $node['tags']['addr:street']));
         $addresses[]=$node;
-    //print_r($node);
+        //print_r($node);
     }
 
     // echo PHP_EOL;
