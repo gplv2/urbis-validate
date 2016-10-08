@@ -299,8 +299,6 @@ foreach($new_nodes as $k => $node) {
         continue;
     }
     if (!isset($node['tags']['addr:street']) && isset($node['tags']['highway']) && isset($node['tags']['name'])) {
-        // if ($node['tags']['highway']=='crossing') 
-            //Skip named crossing
         switch ($node['tags']['highway']) {
             case 'crossing':
                 continue;
@@ -309,8 +307,6 @@ foreach($new_nodes as $k => $node) {
                 continue;
                 break;
             default:
-                echo "i equals 2";
-                // node is a street with a name (should not exist)
                 logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['info']['id']));
                 print_r($node);
                 exit(1); 
@@ -633,6 +629,15 @@ function search_street_node($key, array &$arr, $case_sensitive = true){
                     logtrace(4,sprintf("[%s] - md5 check key/name :  %s vs %s ",__METHOD__, md5($a), md5($b)));
                     return($info); 
                 }
+            }
+        }
+        /* Check name:fr + name:nl = name */
+        if (!empty($info['tags']['name:fr']) && !empty($info['tags']['name:nl'])) {
+            $named_combo=sprintf("%s - %s", $info['tags']['name:fr'], $info['tags']['name:nl']);
+            if (strcmp($info['tags']['name'],$named_combo)==0) {
+                logtrace(4,sprintf("[%s] - Both name:fr and name:nl match the name '%s' (combined at - )",__METHOD__,$named_combo));
+            } else {
+                logtrace(2,sprintf("[%s] - There is a difference between 'name:fr - name:nl' vs. the name:'%s' <> '%s'",__METHOD__,$named_combo, $info['tags']['name']));
             }
         }
     }
