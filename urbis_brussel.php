@@ -258,6 +258,11 @@ foreach ($w_arra as $kway => $way) {
 
     } else
 */
+    if (!isset($way['nd'])) {
+        //print_r($way);exit;
+        continue;
+    }
+
     if (!isset($way['tag']) && count($way['nd'])) {
         // No tags on this object but it has nodes , not interesting
         // print_r($way);
