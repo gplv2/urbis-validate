@@ -26,7 +26,7 @@ require_once('cliargs.php');
 require_once('class.colors.php');
 require_once('GeoCalc.class.php');
 
-$verbose=2;
+$verbose=3;
 
 $cliargs= array(
       'auto' => array(
@@ -353,6 +353,9 @@ logtrace(2,sprintf("[%s] - Done ",__METHOD__));
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
 
 $w_arra = null ; unset($w_arra);
+unset($new_node);
+unset($new_way);
+
 if(gc_enabled()) gc_collect_cycles();
 
 /* multiple qries do not work  in Db framework, probably because not all dB's support it 
@@ -368,17 +371,33 @@ $database->query($schema_indexes);
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
 */
 
-exit;
-//print_r($new_nodes);exit;
 //print_r($new_ways);exit;
 
-$addresses = array();
+$new_nodes = $database->select("nodes", [
+    "osmid",
+    "info",
+    "tags"
+]/* ,[ "LIMIT" => 200 ] */);
+
+// print_r($new_nodes);exit;
+
+/*
+            [osmid] => 206269273
+            [info] => {"id":"206269273","timestamp":"2012-02-13T14:57:28Z","uid":"138772","user":"lodde1949","visible":"true","version":"3","changeset":"10673870","lat":"50.8653572","lon":"4.3348301"}
+            [tags] => 
+        )
+*/
 // Extract addresses / aka streets from nodes and ways
 logtrace(2,sprintf("[%s] - Extracting address data from nodes",__METHOD__));
+$addresses = array();
 foreach($new_nodes as $k => $node) {
+    // Convert json
+    $node['tags']=json_decode($node['tags'], true);
+    $node['info']=json_decode($node['info'], true);
+
     if (!isset($node['tags'])) {
-        logtrace(4,sprintf("[%s] - skipping empty tag node '%s'",__METHOD__,$node['info']['id']));
-        if (empty($node['info']['id'])) {
+        logtrace(4,sprintf("[%s] - skipping empty tag node '%s'",__METHOD__,$node['osmid']));
+        if (empty($node['osmid'])) {
             print_r($node);
             exit;
         }
@@ -394,7 +413,7 @@ foreach($new_nodes as $k => $node) {
                 continue;
                 break;
             default:
-                logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['info']['id']));
+                logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['osmid']));
                 print_r($node);
                 exit(1); 
                 break;
@@ -402,13 +421,13 @@ foreach($new_nodes as $k => $node) {
     }
     if (isset($node['tags']['addr:street']) && !isset($node['tags']['highway'])) {
         // node has good address information, we will check this
-        logtrace(3,sprintf("[%s] - node has good data with addr:street '%s' - %s",__METHOD__,$node['info']['id'], $node['tags']['addr:street']));
+        logtrace(3,sprintf("[%s] - node has good data with addr:street '%s' - %s",__METHOD__,$node['osmid'], $node['tags']['addr:street']));
         $addresses[]=$node;
         //print_r($node);
     }
 
     // echo PHP_EOL;
-    if(!isset($node['id']) && isset($node['name'])) { 
+    if(!isset($node['osmid']) && isset($node['name'])) { 
     }
 }
 
@@ -418,13 +437,22 @@ sleep(2);
 $new_nodes = null ; unset($new_nodes);
 if(gc_enabled()) gc_collect_cycles();
 
+$new_ways = $database->select("ways", [
+    "osmid",
+    "info",
+    "tags"
+]/* ,[ "LIMIT" => 200 ] */);
+
+
 $streets = array();
 // Extract addresses / aka streets from ways
 logtrace(2,sprintf("[%s] - Extracting address data from ways",__METHOD__));
 foreach($new_ways as $k => $way) {
+    $way['tags']=json_decode($way['tags'], true);
+    $way['info']=json_decode($way['info'], true);
     if (!isset($way['tags'])) {
-        logtrace(4,sprintf("[%s] - skipping empty tag way '%s'",__METHOD__,$way['info']['id']));
-        if (empty($way['info']['id'])) {
+        logtrace(4,sprintf("[%s] - skipping empty tag way '%s'",__METHOD__,$way['osmid']));
+        if (empty($way['osmid'])) {
             print_r($way);
             exit;
         }
@@ -432,13 +460,13 @@ foreach($new_ways as $k => $way) {
     }
     if (!isset($way['tags']['addr:street']) && isset($way['tags']['highway']) && isset($way['tags']['name'])) {
         // way is a street with a name (should exist for ways, we need this)
-        logtrace(3,sprintf("[%s] - way has good data with name '%s' - %s",__METHOD__,$way['info']['id'], $way['tags']['name']));
+        logtrace(3,sprintf("[%s] - way has good data with name '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['name']));
         // print_r($way);sleep(1);
         $streets[]=$way;
     }
     if (isset($way['tags']['addr:street']) && !isset($way['tags']['highway'])) {
         // way is a street with a name (should exist for ways, we need this)
-        logtrace(3,sprintf("[%s] - way has good data with addr:street '%s' - %s",__METHOD__,$way['info']['id'], $way['tags']['addr:street']));
+        logtrace(3,sprintf("[%s] - way has good data with addr:street '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['addr:street']));
         $addresses[]=$way;
     }
 
@@ -448,21 +476,23 @@ foreach($new_ways as $k => $way) {
     if (!empty($way['tags']['name:fr']) && !empty($way['tags']['name:nl'])) {
         $named_combo=sprintf("%s - %s", $way['tags']['name:fr'], $way['tags']['name:nl']);
         if (strcmp($way['tags']['name'],$named_combo)==0) {
-            logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['info']['id'],$named_combo));
+            logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['osmid'],$named_combo));
         } else {
             // $osm_info['info']['id']
-            logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['info']['id'], $named_combo, $way['tags']['name']));
+            logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['osmid'], $named_combo, $way['tags']['name']));
         }
     } else {
     //print_r($node);exit;
     }
 }
 
+$new_ways = null ; unset($new_ways);
+if(gc_enabled()) gc_collect_cycles();
+
 // Sleep 2 - Laptop getting hot on huge files
 sleep(2);
 
-$new_ways = null ; unset($new_ways);
-if(gc_enabled()) gc_collect_cycles();
+exit;
 
 $mod_nodes=array();
 
