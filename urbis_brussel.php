@@ -1,9 +1,16 @@
 #!/usr/bin/php -q
 <?php
 
+/* Set internal character encoding to UTF-8 */
+mb_internal_encoding("UTF-8");
+
+require_once('cliargs.php');
+
 // Same as error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set("display_errors", 1);
+ini_set('zend.enable_gc', 1); 
+// var_dump(gc_enabled()); 
 
 require 'vendor/autoload.php';
 
@@ -19,14 +26,12 @@ $database = new medoo([
 ]);
 
  
-/* Set internal character encoding to UTF-8 */
-mb_internal_encoding("UTF-8");
+// require_once('class.colors.php');
+// require_once('GeoCalc.class.php');
 
-require_once('cliargs.php');
-require_once('class.colors.php');
-require_once('GeoCalc.class.php');
+$verbose=2;
 
-$verbose=3;
+// CONFIG STARTUP OPTIONS
 
 $cliargs= array(
       'auto' => array(
@@ -59,6 +64,9 @@ $cliargs= array(
          'default' => ''
          )
       );
+
+// TEMPLATES
+
 $osm_template=<<<EOD
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
@@ -105,6 +113,39 @@ $geojson_obj_template=<<<EOD
 },
 EOD;
 
+$schema_nodes=<<<EOD
+CREATE TABLE nodes (
+osmid bigint(20) NOT NULL,
+info TEXT NOT NULL,
+tags NOT NULL default '',
+PRIMARY KEY (osmid) ON CONFLICT REPLACE
+);
+EOD;
+
+$schema_ways=<<<EOD
+CREATE TABLE ways (
+osmid bigint(20) NOT NULL,
+info TEXT NOT NULL,
+tags NOT NULL default '',
+PRIMARY KEY (osmid) ON CONFLICT REPLACE
+);
+EOD;
+
+$schema_streets=<<<EOD
+CREATE TABLE streets (
+osmid bigint(20) NOT NULL,
+name NOT NULL NOT NULL,
+PRIMARY KEY (osmid) ON CONFLICT REPLACE
+);
+EOD;
+
+/* multiple qries do not work  in Db framework, probably because not all dB's support it 
+   The primary keys already exist anyway, but maybe layer we'll index tags for special matches
+*/
+$schema_indexes=<<<EOD
+CREATE INDEX idx_name ON streets(name);
+EOD;
+
 /* command line errors are thrown hereafter */
 $options = cliargs_get_options($cliargs);
 
@@ -130,6 +171,8 @@ $cur_dir = realpath(".");
 // curl 'http://overpass-api.de/api/interpreter' -H 'Pragma: no-cache' -H 'Origin: http://overpass-turbo.eu' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: en,en-US;q=0.8,nl;q=0.6,af;q=0.4,fr;q=0.2' -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Accept: */*' -H 'Cache-Control: no-cache' -H 'X-Requested-With: overpass-turbo' -H 'Connection: keep-alive' -H 'Referer: http://overpass-turbo.eu/' --data $'data=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E%3C!--%0ALooks+for+streets+and+ways+with+dash+in+either+addr%3Astreet+or+the+name+%2C+chances+are+it\'s+an+NL%2FFR+value%0AThey+need+to+have+space+in+front+and+after+%2C+if+not+it\'s+probably+a+dash+in+the+streetname+itself.%0A--%3E%0A%0A%3Cosm-script+output%3D%22xml%22%3E%0A++%3Cunion%3E%0A++%3Cquery+type%3D%22way%22%3E%0A++++%3Chas-kv+k%3D%22addr%3Astreet%22+regv%3D%22+-+%22%2F%3E%0A++++%3Cbbox-query+s%3D%2250.85074309341152%22+w%3D%224.3433332443237305%22+n%3D%2250.85677795627684%22+e%3D%224.357656240463256%22%2F%3E%0A++%3C%2Fquery%3E%0A++%3Cquery+type%3D%22node%22%3E%0A++++%3Chas-kv+k%3D%22addr%3Astreet%22+regv%3D%22+-+%22%2F%3E%0A++++%3Cbbox-query+s%3D%2250.85074309341152%22+w%3D%224.3433332443237305%22+n%3D%2250.85677795627684%22+e%3D%224.357656240463256%22%2F%3E%0A++%3C%2Fquery%3E%0A++%3Cquery+type%3D%22way%22%3E%0A++++%3Chas-kv+k%3D%22name%22+regv%3D%22+-+%22%2F%3E%0A++++%3Chas-kv+k%3D%22highway%22%2F%3E%0A++++%3Cbbox-query+s%3D%2250.85074309341152%22+w%3D%224.3433332443237305%22+n%3D%2250.85677795627684%22+e%3D%224.357656240463256%22%2F%3E%0A++%3C%2Fquery%3E%0A++%3C%2Funion%3E%0A++%3Cprint+mode%3D%22meta%22%2F%3E%0A++%3Crecurse+type%3D%22down%22%2F%3E%0A++%3Cprint+mode%3D%22meta%22%2F%3E%0A%3C%2Fosm-script%3E' --compressed
 
 // bbox needs implementation
+
+// AUTO OVERPASS DOWNLOAD SECTION
 
 if (isset($options['auto']))  {
     /* Now load the Overpass XML */
@@ -189,6 +232,9 @@ if (isset($options['auto']))  {
     /* Now load the Overpass XML */
 }
 
+
+// CHECK FOR INPUT FILE
+
 if (!file_exists($osmfile)) { die("File $osmfile not found"); }
 
 // Load up JOSM / Overpass xml
@@ -202,10 +248,6 @@ logtrace(2,sprintf("[%s] - Decoding Done",__METHOD__));
 // Clear up mem
 $xml= null; unset ($xml);
 if(gc_enabled()) gc_collect_cycles();
-
-// var_dump(gc_enabled()); 
-// ini_set('zend.enable_gc', 0); 
-// var_dump(gc_enabled()); 
 
 
 $marra=$marray['node'];
@@ -227,35 +269,21 @@ if(gc_enabled()) gc_collect_cycles();
 
 logtrace(2,sprintf("[%s] - Creating sqlite tables",__METHOD__));
 
-// Extract OSM node information and build information array
-$new_node=array();
-
-$schema_nodes=<<<EOD
-CREATE TABLE nodes (
-osmid bigint(20) NOT NULL,
-info TEXT NOT NULL,
-tags NOT NULL default '',
-PRIMARY KEY (osmid) ON CONFLICT REPLACE
-);
-EOD;
-
-$schema_ways=<<<EOD
-CREATE TABLE ways (
-osmid bigint(20) NOT NULL,
-info TEXT NOT NULL,
-tags NOT NULL default '',
-PRIMARY KEY (osmid) ON CONFLICT REPLACE
-);
-EOD;
 
 $database->query($schema_nodes);
 $database->query($schema_ways);
+if ($database->query($schema_streets) ) { $database->query($schema_indexes); }
+
 logtrace(2,sprintf("[%s] - Done",__METHOD__));
 
 logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
 $database->pdo->beginTransaction();
 
-$new_nodes=array();
+// Extract OSM information 
+
+// NODES 
+
+$new_node=array();
 logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
 foreach ($marra as $knode => $node) {
     $new_node=array();
@@ -288,21 +316,18 @@ foreach ($marra as $knode => $node) {
     $database->insert("nodes", $new_node);
     // echo PHP_EOL;
 }
-
 logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
 $database->pdo->commit();
 logtrace(2,sprintf("[%s] - Done ",__METHOD__));
 // var_dump( $database->log() );
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-
 $marra = null ; unset($marra);
 if(gc_enabled()) gc_collect_cycles();
-//print_r($node_info);
-//print_r($node_tags);
+
+// WAYS 
 
 logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
 $database->pdo->beginTransaction();
-
 $new_ways=array();
 logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
 foreach ($w_arra as $kway => $way) {
@@ -346,32 +371,18 @@ foreach ($w_arra as $kway => $way) {
     $new_way['(JSON)tags']=$way_tags;
     $database->insert("ways", $new_way);
 }
-
 logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
 $database->pdo->commit();
 logtrace(2,sprintf("[%s] - Done ",__METHOD__));
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-
 $w_arra = null ; unset($w_arra);
 unset($new_node);
 unset($new_way);
-
 if(gc_enabled()) gc_collect_cycles();
 
-/* multiple qries do not work  in Db framework, probably because not all dB's support it 
-   The primary keys already exist anyway, but maybe layer we'll index tags for special matches
-*/
-/*
-logtrace(2,sprintf("[%s] - Creating indexes",__METHOD__));
-$schema_indexes=<<<EOD
-CREATE INDEX idx_osmidn ON nodes(osmid);
-CREATE INDEX idx_osmidw ON ways(osmid);
-EOD;
-$database->query($schema_indexes);
-logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-*/
 
-//print_r($new_ways);exit;
+// GET NODE ADDRESS DATA FROM SQLITE
+$new_nodes=array();
 
 $new_nodes = $database->select("nodes", [
     "osmid",
@@ -379,14 +390,12 @@ $new_nodes = $database->select("nodes", [
     "tags"
 ]/* ,[ "LIMIT" => 200 ] */);
 
-// print_r($new_nodes);exit;
-
 /*
-            [osmid] => 206269273
-            [info] => {"id":"206269273","timestamp":"2012-02-13T14:57:28Z","uid":"138772","user":"lodde1949","visible":"true","version":"3","changeset":"10673870","lat":"50.8653572","lon":"4.3348301"}
-            [tags] => 
-        )
+[osmid] => 206269273
+[info] => {"id":"206269273","timestamp":"2012-02-13T14:57:28Z","uid":"138772","user":"lodde1949","visible":"true","version":"3","changeset":"10673870","lat":"50.8653572","lon":"4.3348301"}
+[tags] =>
 */
+
 // Extract addresses / aka streets from nodes and ways
 logtrace(2,sprintf("[%s] - Extracting address data from nodes",__METHOD__));
 $addresses = array();
@@ -403,8 +412,7 @@ foreach($new_nodes as $k => $node) {
         }
         // A bit dirty solution
         continue;
-    }
-    if (!isset($node['tags']['addr:street']) && isset($node['tags']['highway']) && isset($node['tags']['name'])) {
+    } elseif (!isset($node['tags']['addr:street']) && isset($node['tags']['highway']) && isset($node['tags']['name'])) {
         switch ($node['tags']['highway']) {
             case 'crossing':
                 continue;
@@ -418,10 +426,9 @@ foreach($new_nodes as $k => $node) {
                 exit(1); 
                 break;
         }
-    }
-    if (isset($node['tags']['addr:street']) && !isset($node['tags']['highway'])) {
+    } elseif (isset($node['tags']['addr:street']) && !isset($node['tags']['highway'])) {
         // node has good address information, we will check this
-        logtrace(3,sprintf("[%s] - node has good data with addr:street '%s' - %s",__METHOD__,$node['osmid'], $node['tags']['addr:street']));
+        logtrace(3,sprintf("[%s] - node has data with addr:street '%s' - %s",__METHOD__,$node['osmid'], $node['tags']['addr:street']));
         $addresses[]=$node;
         //print_r($node);
     }
@@ -431,8 +438,8 @@ foreach($new_nodes as $k => $node) {
     }
 }
 
-// Sleep 2 - Laptop getting hot on huge files
-sleep(2);
+// Sleep 1 - Laptop getting hot on huge files
+sleep(1);
 
 $new_nodes = null ; unset($new_nodes);
 if(gc_enabled()) gc_collect_cycles();
@@ -443,6 +450,8 @@ $new_ways = $database->select("ways", [
     "tags"
 ]/* ,[ "LIMIT" => 200 ] */);
 
+
+// GET WAY ADDRESS DATA FROM SQLITE
 
 $streets = array();
 // Extract addresses / aka streets from ways
@@ -460,13 +469,13 @@ foreach($new_ways as $k => $way) {
     }
     if (!isset($way['tags']['addr:street']) && isset($way['tags']['highway']) && isset($way['tags']['name'])) {
         // way is a street with a name (should exist for ways, we need this)
-        logtrace(3,sprintf("[%s] - way has good data with name '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['name']));
+        logtrace(3,sprintf("[%s] - way has data with name '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['name']));
         // print_r($way);sleep(1);
         $streets[]=$way;
     }
     if (isset($way['tags']['addr:street']) && !isset($way['tags']['highway'])) {
         // way is a street with a name (should exist for ways, we need this)
-        logtrace(3,sprintf("[%s] - way has good data with addr:street '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['addr:street']));
+        logtrace(3,sprintf("[%s] - way has data with addr:street '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['addr:street']));
         $addresses[]=$way;
     }
 
@@ -489,34 +498,51 @@ foreach($new_ways as $k => $way) {
 $new_ways = null ; unset($new_ways);
 if(gc_enabled()) gc_collect_cycles();
 
-// Sleep 2 - Laptop getting hot on huge files
-sleep(2);
-
-exit;
 
 $mod_nodes=array();
 
-logtrace(3,sprintf("[%s] - Have %s streets",__METHOD__,count($streets)));
-logtrace(3,sprintf("[%s] - Have %s addresses",__METHOD__,count($addresses)));
+logtrace(2,sprintf("[%s] - Have %s streets",__METHOD__,count($streets)));
+logtrace(2,sprintf("[%s] - Have %s addresses",__METHOD__,count($addresses)));
 
 if (!$streets) { 
     logtrace(3,sprintf("[%s] - Cant check as we have extracted no streets from xml",__METHOD__));
     exit;
 }
 
-// print_r($streets);exit;
 // For presentation reasons, quick sorted list:
 logtrace(2,sprintf("[%s] - Extracting street list data",__METHOD__));
 foreach($streets as $k => $v ) {
-    $strt[]=$v['tags']['name'];
+    // print_r($v);exit;
+    $strt=$v['tags']['name'];
+    $streetname = array ("osmid" => $v['osmid'], "name" => $strt );
+    $database->insert("streets",$streetname);
 }
+
+// print_r($strt);exit;
+
+// select name from streets group by name order by name ascl
+// SELECT "name" FROM "streets" GROUP BY "name" ORDER BY "name ASC"
+
+$s = $database->select("streets", [ 
+    "osmid",
+    "name"
+], [
+    "GROUP" => "name",
+    "ORDER" => "name ASC"
+]);
+
+// print_r($s);exit;
+// print_r(count($s));exit;
+
 logtrace(3,sprintf("[%s] - Extracted street list",__METHOD__));
-if (isset($strt)) { 
-    asort($strt); 
-    foreach($strt as $k => $v ) {
-        logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v));
+if (isset($s)) { 
+    // asort($strt); 
+    foreach($s as $k => $v ) {
+        logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v['name']));
     }
 }
+
+exit;
 
 /**
 * usort callback
@@ -567,7 +593,6 @@ Array
 
 )
 */
-
 
 logtrace(2,sprintf("[%s] - Validating address data",__METHOD__));
 $cnt=0;
