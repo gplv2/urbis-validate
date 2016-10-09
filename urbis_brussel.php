@@ -1,6 +1,24 @@
 #!/usr/bin/php -q
 <?php
 
+// Same as error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+ini_set("display_errors", 1);
+
+require 'vendor/autoload.php';
+
+$database_file='urbis.sqlite';
+
+if (file_exists($database_file)) {
+    unlink($database_file);
+}
+
+$database = new medoo([
+    'database_type' => 'sqlite',
+    'database_file' => $database_file
+]);
+
+ 
 /* Set internal character encoding to UTF-8 */
 mb_internal_encoding("UTF-8");
 
@@ -9,7 +27,6 @@ require_once('class.colors.php');
 require_once('GeoCalc.class.php');
 
 $verbose=2;
-$new_counter=-347;
 
 $cliargs= array(
       'auto' => array(
@@ -207,12 +224,41 @@ logtrace(2,sprintf("[%s] - OK",__METHOD__));
 $marray = null ; unset($marray);
 if(gc_enabled()) gc_collect_cycles();
 
-$new_nodes=array();
-$new_ways=array();
+
+logtrace(2,sprintf("[%s] - Creating sqlite tables",__METHOD__));
 
 // Extract OSM node information and build information array
+$new_node=array();
+
+$schema_nodes=<<<EOD
+CREATE TABLE nodes (
+osmid bigint(20) NOT NULL,
+info TEXT NOT NULL,
+tags NOT NULL default '',
+PRIMARY KEY (osmid) ON CONFLICT REPLACE
+);
+EOD;
+
+$schema_ways=<<<EOD
+CREATE TABLE ways (
+osmid bigint(20) NOT NULL,
+info TEXT NOT NULL,
+tags NOT NULL default '',
+PRIMARY KEY (osmid) ON CONFLICT REPLACE
+);
+EOD;
+
+$database->query($schema_nodes);
+$database->query($schema_ways);
+logtrace(2,sprintf("[%s] - Done",__METHOD__));
+
+logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+$database->pdo->beginTransaction();
+
+$new_nodes=array();
 logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
 foreach ($marra as $knode => $node) {
+    $new_node=array();
     $node_info=$node['@attributes'];
     $break=0;
     //print_r($node);
@@ -234,18 +280,32 @@ foreach ($marra as $knode => $node) {
             logtrace(0,sprintf("[%s] - Error, empty tags, somethings isn't parsing well for node '%s'",__METHOD__,$node_info['id']));
             exit;
         }
-        $new_nodes[$node_info['id']]['tags']=$node_tags;
+        $new_node['(JSON)tags']=$node_tags;
     }
-    $new_nodes[$node_info['id']]['info']=$node_info;
+    $new_node['(JSON)info']=$node_info;
+    //print_r($new_node); break;
+    $database->insert("nodes", $new_node);
+    // echo PHP_EOL;
 }
+
+logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+$database->pdo->commit();
+logtrace(2,sprintf("[%s] - Done ",__METHOD__));
+// var_dump( $database->log() );
+logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
 
 $marra = null ; unset($marra);
 if(gc_enabled()) gc_collect_cycles();
 //print_r($node_info);
 //print_r($node_tags);
 
+logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+$database->pdo->beginTransaction();
+
+$new_ways=array();
 logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
 foreach ($w_arra as $kway => $way) {
+    $new_way=array();
     $way_info=$way['@attributes'];
     if(!isset($way_info)) {
         print_r($way);exit;
@@ -280,9 +340,16 @@ foreach ($w_arra as $kway => $way) {
         //print_r($val);
     }
     $way_tags=array_combine($key, $val);
-    $new_ways[$way_info['id']]['tags']=$way_tags;
-    $new_ways[$way_info['id']]['info']=$way_info;
+    $new_way['(JSON)tags']=$way_tags;
+    $new_way['(JSON)info']=$way_info;
+    $database->insert("ways", $new_way);
 }
+
+logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+$database->pdo->commit();
+logtrace(2,sprintf("[%s] - Done ",__METHOD__));
+logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+exit;
 
 $w_arra = null ; unset($w_arra);
 if(gc_enabled()) gc_collect_cycles();
