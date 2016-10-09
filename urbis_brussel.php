@@ -260,6 +260,7 @@ logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
 foreach ($marra as $knode => $node) {
     $new_node=array();
     $node_info=$node['@attributes'];
+    $new_node['osmid']=$node_info['id'];
     $break=0;
     //print_r($node);
     //print_r($node_info);exit;
@@ -307,6 +308,7 @@ logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
 foreach ($w_arra as $kway => $way) {
     $new_way=array();
     $way_info=$way['@attributes'];
+    $new_way['osmid']=$way_info['id'];
     if(!isset($way_info)) {
         print_r($way);exit;
     }
@@ -340,8 +342,8 @@ foreach ($w_arra as $kway => $way) {
         //print_r($val);
     }
     $way_tags=array_combine($key, $val);
-    $new_way['(JSON)tags']=$way_tags;
     $new_way['(JSON)info']=$way_info;
+    $new_way['(JSON)tags']=$way_tags;
     $database->insert("ways", $new_way);
 }
 
@@ -349,11 +351,24 @@ logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
 $database->pdo->commit();
 logtrace(2,sprintf("[%s] - Done ",__METHOD__));
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-exit;
 
 $w_arra = null ; unset($w_arra);
 if(gc_enabled()) gc_collect_cycles();
 
+/* multiple qries do not work  in Db framework, probably because not all dB's support it 
+   The primary keys already exist anyway, but maybe layer we'll index tags for special matches
+*/
+/*
+logtrace(2,sprintf("[%s] - Creating indexes",__METHOD__));
+$schema_indexes=<<<EOD
+CREATE INDEX idx_osmidn ON nodes(osmid);
+CREATE INDEX idx_osmidw ON ways(osmid);
+EOD;
+$database->query($schema_indexes);
+logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+*/
+
+exit;
 //print_r($new_nodes);exit;
 //print_r($new_ways);exit;
 
