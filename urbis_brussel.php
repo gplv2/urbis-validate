@@ -497,12 +497,13 @@ foreach($new_ways as $k => $way) {
         $named_combo=sprintf("%s - %s", $way['tags']['name:fr'], $way['tags']['name:nl']);
         if (empty($way['tags']['name'])) {
             logtrace(3,sprintf("[%s] - [id:%d] Missing 'name' for this object , suggesting: '%s'",__METHOD__,$way['osmid'],$named_combo));
-        }
-        if (strcmp($way['tags']['name'],$named_combo)==0) {
-            logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['osmid'],$named_combo));
         } else {
-            // $osm_info['info']['id']
-            logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['osmid'], $named_combo, $way['tags']['name']));
+            if (strcmp($way['tags']['name'],$named_combo)==0) {
+                logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['osmid'],$named_combo));
+            } else {
+                // $osm_info['info']['id']
+                logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['osmid'], $named_combo, $way['tags']['name']));
+            }
         }
     } else {
     //print_r($node);exit;
