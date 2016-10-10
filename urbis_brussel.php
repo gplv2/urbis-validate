@@ -16,16 +16,6 @@ require 'vendor/autoload.php';
 
 $database_file='urbis.sqlite';
 
-if (file_exists($database_file)) {
-    unlink($database_file);
-}
-
-$database = new medoo([
-    'database_type' => 'sqlite',
-    'database_file' => $database_file
-]);
-
- 
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
@@ -52,10 +42,10 @@ $cliargs= array(
          'description' => "The name of the output diff file (with corrections)",
          'default' => ''
          ),
-      'skiplocationupdate' => array(
+      'skipload' => array(
          'short' => 's',
          'type' => 'switch',
-         'description' => "Do not modify any lat/lon data, use when source data is wrong (which it is for some locations) about the coordinates, use the map"
+         'description' => "Do not parse the source data again, work on existing sqlite tables data"
          ),
       'format' => array(
          'short' => 't',
@@ -66,6 +56,7 @@ $cliargs= array(
       );
 
 // TEMPLATES
+
 
 $osm_template=<<<EOD
 <?xml version='1.0' encoding='UTF-8'?>
@@ -157,7 +148,7 @@ if (isset($options['file']) && !isset($options['osm'])) {
 if (isset($options['auto'])) { $auto  = 1 ; unset($options['file']); } else { unset($auto); }
 if (isset($options['osm'])) {  $osmfile  = trim($options['osm']); } else { unset($osmfile); }
 if (isset($options['format'])) { $output  = trim($options['format']); } else { unset($output); }
-if (isset($options['skiplocationupdate'])) { $skip = true; } else { $skip = false; }
+if (isset($options['skipload'])) { $skipload = true; } else { $skipload = false; }
 if (isset($options['changefile'])) { $changefile = trim($options['changefile']); } else { unset($changefile); }
 
 if (empty($changefile)) {
@@ -232,69 +223,149 @@ if (isset($options['auto']))  {
     /* Now load the Overpass XML */
 }
 
+// only erase db when skipload is false
+if (!$skipload) {
+    if (file_exists($database_file)) {
+        unlink($database_file);
+    }
+}
+
+$database = new medoo([
+    'database_type' => 'sqlite',
+    'database_file' => $database_file
+]);
 
 // CHECK FOR INPUT FILE
 
 if (!file_exists($osmfile)) { die("File $osmfile not found"); }
 
-// Load up JOSM / Overpass xml
-logtrace(2,sprintf("[%s] - Loading %s",__METHOD__, $osmfile));
-$xml = simplexml_load_file($osmfile);
-logtrace(2,sprintf("[%s] - Loading done : %s Mb",__METHOD__, round(filesize($osmfile)/1024/1024)));
-logtrace(2,sprintf("[%s] - Decoding ... ",__METHOD__));
-$marray=(json_decode(json_encode((array) $xml), 1));
-logtrace(2,sprintf("[%s] - Decoding Done",__METHOD__));
+if (!$skipload) {
+    // Load up JOSM / Overpass xml
+    logtrace(2,sprintf("[%s] - Loading %s",__METHOD__, $osmfile));
+    $xml = simplexml_load_file($osmfile);
+    logtrace(2,sprintf("[%s] - Loading done : %s Mb",__METHOD__, round(filesize($osmfile)/1024/1024)));
+    logtrace(2,sprintf("[%s] - Decoding ... ",__METHOD__));
+    $marray=(json_decode(json_encode((array) $xml), 1));
+    logtrace(2,sprintf("[%s] - Decoding Done",__METHOD__));
 
-// Clear up mem
-$xml= null; unset ($xml);
-if(gc_enabled()) gc_collect_cycles();
+    // Clear up mem
+    $xml= null; unset ($xml);
+    if(gc_enabled()) gc_collect_cycles();
 
+    $marra=$marray['node'];
+    // print_r($marray['way']);exit;
 
-$marra=$marray['node'];
-// print_r($marray['way']);exit;
+    // Handle single street / addr node situations
+    logtrace(2,sprintf("[%s] - Check validity of street data",__METHOD__));
+    if(isset($marray['way']['@attributes'] )) {
+        logtrace(2,sprintf("[%s] - fixing street array",__METHOD__));
+        $w_arra=array($marray['way']);
+    } else {
+        $w_arra=$marray['way'];
+    }
+    logtrace(2,sprintf("[%s] - OK",__METHOD__));
 
-// Handle single street / addr node situations
-logtrace(2,sprintf("[%s] - Check validity of street data",__METHOD__));
-if(isset($marray['way']['@attributes'] )) {
-    logtrace(2,sprintf("[%s] - fixing street array",__METHOD__));
-    $w_arra=array($marray['way']);
-} else {
-    $w_arra=$marray['way'];
-}
-logtrace(2,sprintf("[%s] - OK",__METHOD__));
-
-$marray = null ; unset($marray);
-if(gc_enabled()) gc_collect_cycles();
-
-
-logtrace(2,sprintf("[%s] - Creating sqlite tables",__METHOD__));
+    $marray = null ; unset($marray);
+    if(gc_enabled()) gc_collect_cycles();
 
 
-$database->query($schema_nodes);
-$database->query($schema_ways);
-if ($database->query($schema_streets) ) { $database->query($schema_indexes); }
+    logtrace(2,sprintf("[%s] - Creating sqlite tables",__METHOD__));
 
-logtrace(2,sprintf("[%s] - Done",__METHOD__));
+    $database->query($schema_nodes);
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    $database->query($schema_ways);
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    if ($database->query($schema_streets) ) {
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        $database->query($schema_indexes); 
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    } else {
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    }
+    logtrace(2,sprintf("[%s] - Done",__METHOD__));
 
-logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
-$database->pdo->beginTransaction();
+    logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+    $database->pdo->beginTransaction();
 
-// Extract OSM information 
+    // Extract OSM information 
 
-// NODES 
+    // NODES 
 
-$new_node=array();
-logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
-foreach ($marra as $knode => $node) {
     $new_node=array();
-    $node_info=$node['@attributes'];
-    $new_node['osmid']=$node_info['id'];
-    $break=0;
-    //print_r($node);
-    //print_r($node_info);exit;
-    if (!empty($node['tag'])) {
-        $key= array_value_recursive('k', $node['tag']);
-        $val= array_value_recursive('v', $node['tag']);
+    logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
+    foreach ($marra as $knode => $node) {
+        $new_node=array();
+        $node_info=$node['@attributes'];
+        $new_node['osmid']=$node_info['id'];
+        $break=0;
+        //print_r($node);
+        //print_r($node_info);exit;
+        if (!empty($node['tag'])) {
+            $key= array_value_recursive('k', $node['tag']);
+            $val= array_value_recursive('v', $node['tag']);
+            if (is_string($key)) {
+                $break=1;
+                // Only single key/val in this object
+                $key=array($key);
+                $val=array($val);
+                //print_r($key);
+                //print_r($val);
+            }
+            $node_tags=array_combine($key, $val);
+            if (empty($node_tags)) {
+                //print_r($node);exit;
+                logtrace(0,sprintf("[%s] - Error, empty tags, somethings isn't parsing well for node '%s'",__METHOD__,$node_info['id']));
+                exit;
+            }
+            $new_node['(JSON)tags']=$node_tags;
+        }
+        $new_node['(JSON)info']=$node_info;
+        //print_r($new_node); break;
+        $database->insert("nodes", $new_node);
+        // echo PHP_EOL;
+    }
+    logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+    $database->pdo->commit();
+    logtrace(2,sprintf("[%s] - Done ",__METHOD__));
+    // var_dump( $database->log() );
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    $marra = null ; unset($marra);
+    if(gc_enabled()) gc_collect_cycles();
+
+    // WAYS 
+
+    logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+    $database->pdo->beginTransaction();
+    $new_ways=array();
+    logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
+    foreach ($w_arra as $kway => $way) {
+        $new_way=array();
+        $way_info=$way['@attributes'];
+        $new_way['osmid']=$way_info['id'];
+        if(!isset($way_info)) {
+            print_r($way);exit;
+        }
+        /*
+           if(isset($way['@attributes'] )) {
+        // This is probably a relation
+        print_r($way);exit;
+        continue;
+
+        } else
+         */
+        if (!isset($way['nd'])) {
+            //print_r($way);exit;
+            continue;
+        }
+
+        if (!isset($way['tag']) && count($way['nd'])) {
+            // No tags on this object but it has nodes , not interesting
+            // print_r($way);
+            continue;
+        }
+
+        $key= array_value_recursive('k', $way['tag']);
+        $val= array_value_recursive('v', $way['tag']);
         if (is_string($key)) {
             $break=1;
             // Only single key/val in this object
@@ -303,83 +374,20 @@ foreach ($marra as $knode => $node) {
             //print_r($key);
             //print_r($val);
         }
-        $node_tags=array_combine($key, $val);
-        if (empty($node_tags)) {
-            //print_r($node);exit;
-            logtrace(0,sprintf("[%s] - Error, empty tags, somethings isn't parsing well for node '%s'",__METHOD__,$node_info['id']));
-            exit;
-        }
-        $new_node['(JSON)tags']=$node_tags;
+        $way_tags=array_combine($key, $val);
+        $new_way['(JSON)info']=$way_info;
+        $new_way['(JSON)tags']=$way_tags;
+        $database->insert("ways", $new_way);
     }
-    $new_node['(JSON)info']=$node_info;
-    //print_r($new_node); break;
-    $database->insert("nodes", $new_node);
-    // echo PHP_EOL;
+    logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+    $database->pdo->commit();
+    logtrace(2,sprintf("[%s] - Done ",__METHOD__));
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    $w_arra = null ; unset($w_arra);
+    unset($new_node);
+    unset($new_way);
+    if(gc_enabled()) gc_collect_cycles();
 }
-logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
-$database->pdo->commit();
-logtrace(2,sprintf("[%s] - Done ",__METHOD__));
-// var_dump( $database->log() );
-logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-$marra = null ; unset($marra);
-if(gc_enabled()) gc_collect_cycles();
-
-// WAYS 
-
-logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
-$database->pdo->beginTransaction();
-$new_ways=array();
-logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
-foreach ($w_arra as $kway => $way) {
-    $new_way=array();
-    $way_info=$way['@attributes'];
-    $new_way['osmid']=$way_info['id'];
-    if(!isset($way_info)) {
-        print_r($way);exit;
-    }
-/*
-    if(isset($way['@attributes'] )) {
-        // This is probably a relation
-        print_r($way);exit;
-        continue;
-
-    } else
-*/
-    if (!isset($way['nd'])) {
-        //print_r($way);exit;
-        continue;
-    }
-
-    if (!isset($way['tag']) && count($way['nd'])) {
-        // No tags on this object but it has nodes , not interesting
-        // print_r($way);
-        continue;
-    }
-
-    $key= array_value_recursive('k', $way['tag']);
-    $val= array_value_recursive('v', $way['tag']);
-    if (is_string($key)) {
-        $break=1;
-        // Only single key/val in this object
-        $key=array($key);
-        $val=array($val);
-        //print_r($key);
-        //print_r($val);
-    }
-    $way_tags=array_combine($key, $val);
-    $new_way['(JSON)info']=$way_info;
-    $new_way['(JSON)tags']=$way_tags;
-    $database->insert("ways", $new_way);
-}
-logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
-$database->pdo->commit();
-logtrace(2,sprintf("[%s] - Done ",__METHOD__));
-logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-$w_arra = null ; unset($w_arra);
-unset($new_node);
-unset($new_way);
-if(gc_enabled()) gc_collect_cycles();
-
 
 // GET NODE ADDRESS DATA FROM SQLITE
 $new_nodes=array();
@@ -397,7 +405,7 @@ $new_nodes = $database->select("nodes", [
 */
 
 // Extract addresses / aka streets from nodes and ways
-logtrace(2,sprintf("[%s] - Extracting address data from nodes",__METHOD__));
+logtrace(2,sprintf("[%s] - Parsing address data from table 'nodes'",__METHOD__));
 $addresses = array();
 foreach($new_nodes as $k => $node) {
     // Convert json
@@ -418,6 +426,9 @@ foreach($new_nodes as $k => $node) {
                 continue;
                 break;
             case 'bus_stop':
+                continue;
+                break;
+            case 'traffic_signals':
                 continue;
                 break;
             default:
@@ -455,7 +466,7 @@ $new_ways = $database->select("ways", [
 
 $streets = array();
 // Extract addresses / aka streets from ways
-logtrace(2,sprintf("[%s] - Extracting address data from ways",__METHOD__));
+logtrace(2,sprintf("[%s] - Parsing address data from table 'ways'",__METHOD__));
 foreach($new_ways as $k => $way) {
     $way['tags']=json_decode($way['tags'], true);
     $way['info']=json_decode($way['info'], true);
@@ -484,6 +495,9 @@ foreach($new_ways as $k => $way) {
     /* Check name:fr + name:nl = name */
     if (!empty($way['tags']['name:fr']) && !empty($way['tags']['name:nl'])) {
         $named_combo=sprintf("%s - %s", $way['tags']['name:fr'], $way['tags']['name:nl']);
+        if (empty($way['tags']['name'])) {
+            logtrace(3,sprintf("[%s] - [id:%d] Missing 'name' for this object , suggesting: '%s'",__METHOD__,$way['osmid'],$named_combo));
+        }
         if (strcmp($way['tags']['name'],$named_combo)==0) {
             logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['osmid'],$named_combo));
         } else {
@@ -509,14 +523,20 @@ if (!$streets) {
     exit;
 }
 
+logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+$database->pdo->beginTransaction();
+
 // For presentation reasons, quick sorted list:
-logtrace(2,sprintf("[%s] - Extracting street list data",__METHOD__));
+logtrace(2,sprintf("[%s] - Parsing street list data",__METHOD__));
 foreach($streets as $k => $v ) {
     // print_r($v);exit;
     $strt=$v['tags']['name'];
     $streetname = array ("osmid" => $v['osmid'], "name" => $strt );
     $database->insert("streets",$streetname);
 }
+logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+$database->pdo->commit();
+logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
 
 // print_r($strt);exit;
 
@@ -534,12 +554,13 @@ $s = $database->select("streets", [
 // print_r($s);exit;
 // print_r(count($s));exit;
 
-logtrace(3,sprintf("[%s] - Extracted street list",__METHOD__));
+logtrace(2,sprintf("[%s] - Selecting street list data",__METHOD__));
 if (isset($s)) { 
     // asort($strt); 
     foreach($s as $k => $v ) {
         logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v['name']));
     }
+    logtrace(2,sprintf("[%s] - %d street names found",__METHOD__,count($s)));
 }
 
 exit;
