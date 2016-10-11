@@ -2,6 +2,8 @@
 
 Install PHP first
 
+## Prepare
+
 There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
 
  - [v1](https://github.com/gplv2/urbis-validate/tree/v1): Fast as long as the xml isn't too huge, really big OSM files choke my laptop, so I needed a more memory friendly version
@@ -9,6 +11,16 @@ There are 2 versions of this tool, the first attempt which loads plenty of stuff
 
 You can run this tool over a file you are editting in JOSM , my workflow goes like this:
  - fix the problem -> CTRL+S -> urbisvalidate -> fix problem , repeat.
+
+We need composer to use the db abstraction library:
+
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    
+Then you need to install the requirements in your cloned folder
+
+    composer install && composer dump-autoload
+
+After that you should be ready to run the tool
 
 # Read 
 
