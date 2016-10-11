@@ -498,11 +498,17 @@ foreach($new_ways as $k => $way) {
         if (empty($way['tags']['name'])) {
             logtrace(3,sprintf("[%s] - [id:%d] Missing 'name' for this object , suggesting: '%s'",__METHOD__,$way['osmid'],$named_combo));
         } else {
+            // Exclude boundaries from being checked on name:fr etc.
+            if  (array_key_exists('boundary', $way['tags'])) {
+                logtrace(4,sprintf("[%s] - [id:%d] Skipping boundaries name:fr and name:nl check.",__METHOD__,$way['osmid']));
+                continue;
+            }
             if (strcmp($way['tags']['name'],$named_combo)==0) {
                 logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$way['osmid'],$named_combo));
             } else {
                 // $osm_info['info']['id']
                 logtrace(2,sprintf("[%s] - [id:%d] Difference between name:fr + name:nl vs. the name: '%s' <> '%s'",__METHOD__,$way['osmid'], $named_combo, $way['tags']['name']));
+                // print_r($way);exit;
             }
         }
     } else {
@@ -528,7 +534,7 @@ logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
 $database->pdo->beginTransaction();
 
 // For presentation reasons, quick sorted list:
-logtrace(2,sprintf("[%s] - Parsing street list data",__METHOD__));
+logtrace(2,sprintf("[%s] - Storing street list data",__METHOD__));
 foreach($streets as $k => $v ) {
     // print_r($v);exit;
     $strt=$v['tags']['name'];
@@ -564,8 +570,6 @@ if (isset($s)) {
     logtrace(2,sprintf("[%s] - %d street names found",__METHOD__,count($s)));
 }
 
-exit;
-
 /**
 * usort callback
 */
@@ -584,8 +588,10 @@ function name_compare($a, $b) {
     }
 }
 
+/*
 logtrace(2,sprintf("[%s] - Sorting source addresses ...",__METHOD__));
 usort($addresses, "name_compare");
+*/
 
 
 logtrace(2,sprintf("[%s] - Done sorting",__METHOD__));
@@ -619,6 +625,7 @@ Array
 logtrace(2,sprintf("[%s] - Validating address data",__METHOD__));
 $cnt=0;
 foreach($addresses as $k => $node) {
+    //print_r($node);exit;
     logtrace(4,sprintf("[%s] - Checking address %s",__METHOD__,$k));
     if(isset($node['info']['id'])) {
         $osm_id=$node['info']['id'];
@@ -633,6 +640,10 @@ foreach($addresses as $k => $node) {
     /* Check name:fr + name:nl = name */
     if (!empty($node['tags']['name:fr']) && !empty($node['tags']['name:nl'])) {
         $named_combo=sprintf("%s - %s", $node['tags']['name:fr'], $node['tags']['name:nl']);
+        if  (!array_key_exists('name', $node['tags'])) {
+            logtrace(2,sprintf("[%s] - [id:%d] Object is missing the full 'name' : suggesting: '%s'",__METHOD__,$node['info']['id'],$named_combo));
+            continue;
+        }
         if (strcmp($node['tags']['name'],$named_combo)==0) {
             logtrace(3,sprintf("[%s] - [id:%d] Both name:fr and name:nl match the name for '%s'",__METHOD__,$node['info']['id'],$named_combo));
         } else {
@@ -685,7 +696,7 @@ foreach($addresses as $k => $node) {
                         if (count($osm_info)) {
                             logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
                         } else {
-                            logtrace(1,sprintf("[%s] - Verify Osm_id: [id:%s] - Missing matching street name '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
+                            logtrace(1,sprintf("[%s] - Verify Osm_id: [id:%s] - Missing matching street name - is street loaded ? - : '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                             logtrace(3,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                         }       
                     }
