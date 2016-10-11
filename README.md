@@ -59,8 +59,9 @@ You can run this tool on the cli like this:
     -o/--osm <value> : The name of the OSM file parse the XML from.
     -c/--changefile <value> : The name of the output diff file (with corrections, not fully implemented yet, harder to do correct)
     -t/--format <value> : The name of the output extension (json, geojson, osm) not implemented since this concerns the changefile.
+    -s/--skipload : Do not parse the source data again, work on existing sqlite tables data
 
-## Set verbose to 1, 2 or 3 for meaningfull information
+## Set verbose to 1, 2 or 3 for meaningful information
 
 1. output the core errors 
 2. output the known issues too, like flipped streetnames and spelling errors  (this is the one you want)
@@ -219,6 +220,13 @@ The common way `name:left` and `name:right` doesn't make a change but I find thi
 ![alt text][molen1]
 
 If anyone has a good idea how to solve such an issue, please send feedback.
+
+## other notable dubious streets:
+
+ - Rue de la Cambre - Terkamerenstraat vs. Rue de la Cambre - Ter Kamerenstraat
+ - Avenue de la Chevalerie - Ridderschaplaan vs. Avenue de la Chevalerie - Ridderschapslaan
+ - Chaussée de Louvain - Leuvensesteenweg vs. Chaussée de Louvain - Leuvense Steenweg
+ - Avenue du Val d'Or - Guldendallaan vs. Avenue du Val d'Or - Gouddallaan
 
 ## suggestions
 
