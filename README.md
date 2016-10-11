@@ -2,7 +2,7 @@
 
 Install PHP first
 
-# There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
+There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
 
  - [v1](https://github.com/gplv2/urbis-validate/tree/v1): Fast as long as the xml isn't too huge, really big OSM files choke my laptop, so I needed a more memory friendly version
  - [v2](https://github.com/gplv2/urbis-validate/tree/v2): Uses sqlite, you need 'pdo_sqlite' libs.  (added -s switch to skip reloading xml, for dev reasons mostly)
