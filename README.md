@@ -45,6 +45,8 @@ Specifically made for Brussels.
  - identifies spelling mistakes if no match between the above
  - identifies umatched object addresses
  - identifies order of name (fr - nl)
+ - verifies if name:fr + name:nl = name
+ - verifies if name is missing when name:fr and name:nl are present
  
 Meant to be used while working in JOSM on the osm save file (read only).  Works with relations, ways and nodes.
 
