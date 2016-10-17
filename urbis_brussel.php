@@ -6,6 +6,9 @@ mb_internal_encoding("UTF-8");
 
 require_once('cliargs.php');
 
+// Include some street names that have special tagging and need to be treated with care
+require_once('special.php');
+
 // Same as error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set("display_errors", 1);
@@ -675,7 +678,21 @@ foreach($addresses as $k => $node) {
             logtrace(4,sprintf("[%s] - Check if there is lowercase match '%s'",__METHOD__,$node['tags']['addr:street']));
             $osm_info = search_street_node($node['tags']['addr:street'], $streets, false);
             if (count($osm_info)) {
-                logtrace(2,sprintf("[%s] - Found lowercase match (case problem) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the spelling)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                // Validate against special street name list
+                $am_i_special=false;
+                foreach($special_streets as $my_street) {
+                    if(strpos($node['tags']['addr:street'], $my_street) !== false) {
+                        // echo 'yes its in here';
+                        $am_i_special=true;
+        
+                        break;
+                    }
+                }
+                if ($am_i_special) {
+                    logtrace(2,sprintf("[%s] - Found a street with double/dubious names.  This is a street that has 2 names in atleast 1 language or municipality.  '%s' [id:%d] vs. '%s' [id:%d]. (Dont just 'fix' the names without research)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                } else {
+                    logtrace(2,sprintf("[%s] - Found lowercase match (case problem) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the spelling)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                }
             } else {
                 logtrace(4,sprintf("[%s] - Deep scanning check (nl, fr) '%s'",__METHOD__,$node['tags']['addr:street']));
 
@@ -694,7 +711,22 @@ foreach($addresses as $k => $node) {
                         logtrace(3,sprintf("[%s] - Deep scanning check (levenshtein distance) '%s'",__METHOD__,$node['tags']['addr:street']));
                         $osm_info = search_street_node_deep($node['tags']['addr:street'], $streets, false, false, true);
                         if (count($osm_info)) {
-                            logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                            // Validate against special street name list
+                            $am_i_special=false;
+                            foreach($special_streets as $my_street) {
+                                if(strpos($node['tags']['addr:street'], $my_street) !== false) {
+                                    // echo 'yes its in here';
+                                    $am_i_special=true;
+
+                                    break;
+                                }
+                            }
+                            // ###
+                            if ($am_i_special) {
+                                logtrace(2,sprintf("[%s] - Found a street with double/dubious names.  This is a street that has 2 names in atleast 1 language or municipality.  '%s' [id:%d] vs. '%s' [id:%d]. (Dont just 'fix' the names without research)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                            } else {
+                                logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id:%d] vs. '%s' [id:%d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                            }
                         } else {
                             logtrace(1,sprintf("[%s] - Verify Osm_id: [id:%s] - Missing matching street name - is street loaded ? - : '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                             logtrace(3,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));

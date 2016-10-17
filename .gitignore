@@ -3,3 +3,4 @@ changes.txt
 *.osm
 vendor/
 composer.lock
+urbis.sqlite
