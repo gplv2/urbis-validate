@@ -20,6 +20,11 @@ Then you need to install the requirements in your cloned folder
 
     composer install && composer dump-autoload
 
+## sqlite support
+
+for the sqlite functionality you need to install php sqlite libraries for you version, on ubuntu , try to find it using
+    apt-cache search sqlite | grep php
+
 After that you should be ready to run the tool
 
 # Read 

@@ -233,7 +233,7 @@ if (!$skipload) {
     }
 }
 
-$database = new medoo([
+$database = new Medoo\Medoo([
     'database_type' => 'sqlite',
     'database_file' => $database_file
 ]);
