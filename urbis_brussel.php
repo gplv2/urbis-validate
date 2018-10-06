@@ -1,6 +1,13 @@
 #!/usr/bin/php -q
 <?php
 
+// For character set detecton we need to use strict mode otherwise it's prety much useless
+error_reporting(E_STRICT);
+
+// Import classes
+use \ShapeFile\ShapeFile;
+use \ShapeFile\ShapeFileException;
+
 /* Set internal character encoding to UTF-8 */
 mb_internal_encoding("UTF-8");
 
@@ -12,8 +19,8 @@ require_once('special.php');
 // Same as error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set("display_errors", 1);
-ini_set('zend.enable_gc', 1); 
-// var_dump(gc_enabled()); 
+ini_set('zend.enable_gc', 1);
+// var_dump(gc_enabled());
 
 require 'vendor/autoload.php';
 
@@ -22,7 +29,7 @@ $database_file='urbis.sqlite';
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
-$verbose=2;
+$verbose=5;
 
 // CONFIG STARTUP OPTIONS
 
@@ -33,9 +40,15 @@ $cliargs= array(
          'description' => "Get all data automatically from Overpass API, will unset file option (not fully implemented yet)",
          'default' => true
          ),
+      'urbis' => array(
+         'short' => 'u',
+         'type' => 'switch',
+         'description' => "Parse urbis shapefile and create sqlite DB with streetnames",
+         'default' => false
+         ),
       'osm' => array(
          'short' => 'o',
-         'type' => 'required',
+         'type' => 'optional',
          'description' => "The name of the OSM file parse the XML from.",
          'default' => ''
          ),
@@ -133,7 +146,7 @@ PRIMARY KEY (osmid) ON CONFLICT REPLACE
 );
 EOD;
 
-/* multiple qries do not work  in Db framework, probably because not all dB's support it 
+/* multiple qries do not work  in Db framework, probably because not all dB's support it
    The primary keys already exist anyway, but maybe layer we'll index tags for special matches
 */
 $schema_indexes=<<<EOD
@@ -143,7 +156,7 @@ EOD;
 /* command line errors are thrown hereafter */
 $options = cliargs_get_options($cliargs);
 
-if (isset($options['file']) && !isset($options['osm'])) { 
+if (isset($options['file']) && !isset($options['osm'])) {
   logtrace(0,sprintf("[%s] - In file mode, also pass osm file.",__METHOD__));
   exit;
 }
@@ -153,6 +166,7 @@ if (isset($options['osm'])) {  $osmfile  = trim($options['osm']); } else { unset
 if (isset($options['format'])) { $output  = trim($options['format']); } else { unset($output); }
 if (isset($options['skipload'])) { $skipload = true; } else { $skipload = false; }
 if (isset($options['changefile'])) { $changefile = trim($options['changefile']); } else { unset($changefile); }
+if (isset($options['urbis'])) { $urbis= $osm = 1 ; unset($options['file']); } else { unset($urbis); }
 
 if (empty($changefile)) {
     unset($changefile);
@@ -167,6 +181,51 @@ $cur_dir = realpath(".");
 // bbox needs implementation
 
 // AUTO OVERPASS DOWNLOAD SECTION
+if (isset($options['urbis']))  {
+
+    try {
+        // Open shapefile
+        $ShapeFile = new ShapeFile('/home/glenn/Downloads/urbis/shp/UrbAdm_STREET_SURFACE_LEVEL0.shp');
+
+        // Get Shape Type
+        logtrace(2,sprintf("[%s] - Shape Type : %s - %s",__METHOD__, $ShapeFile->getShapeType(), $ShapeFile->getShapeType(ShapeFile::FORMAT_STR)));
+
+        // Get number of Records
+        logtrace(2,sprintf("[%s] - Records : %s",__METHOD__, $ShapeFile->getTotRecords()));
+
+        // Get Bounding Box
+        logtrace(2,sprintf("[%s] - Bounding Box : %s",__METHOD__, print_r($ShapeFile->getBoundingBox(),true)));
+
+        // Get DBF Fields
+        logtrace(2,sprintf("[%s] - DBF Fields : %s",__METHOD__, print_r($ShapeFile->getDBFFields(),true)));
+
+        // Sets default return format
+        $ShapeFile->setDefaultGeometryFormat(ShapeFile::GEOMETRY_WKT | ShapeFile::GEOMETRY_GEOJSON_GEOMETRY);
+
+        // Read all the records using a foreach loop
+        foreach ($ShapeFile as $i => $record) {
+            if ($record['dbf']['_deleted']) continue;
+
+            logtrace(2,sprintf("%s - %s",utf8_decode($record['dbf']['PN_NAME_FR']),utf8_decode($record['dbf']['PN_NAME_DU'])));
+            // Record number
+//            echo "Record number: $i\n";
+            // Geometry
+ //           print_r($record['shp']);
+            // DBF Data
+//            print_r($record['dbf']);
+            //mb_detect_encoding($record['dbf']['PN_NAME_FR']). PHP_EOL;
+            //mb_detect_encoding($record['dbf']['PN_NAME_DU']). PHP_EOL;
+
+//            exit;
+        }
+
+    } catch (ShapeFileException $e) {
+        // Print detailed error information
+        exit('Error '.$e->getCode().' ('.$e->getErrorType().'): '.$e->getMessage());
+    }
+
+    exit;
+}
 
 if (isset($options['auto']))  {
     /* Now load the Overpass XML */
@@ -256,7 +315,6 @@ if (!$skipload) {
     if(gc_enabled()) gc_collect_cycles();
 
     $marra=$marray['node'];
-    // print_r($marray['way']);exit;
 
     // Handle single street / addr node situations
     logtrace(2,sprintf("[%s] - Check validity of street data",__METHOD__));
@@ -280,7 +338,7 @@ if (!$skipload) {
     logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
     if ($database->query($schema_streets) ) {
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-        $database->query($schema_indexes); 
+        $database->query($schema_indexes);
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
     } else {
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
@@ -290,12 +348,13 @@ if (!$skipload) {
     logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
     $database->pdo->beginTransaction();
 
-    // Extract OSM information 
+    // Extract OSM information
 
-    // NODES 
+    // NODES
 
     $new_node=array();
     logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
+    //print_r($marra);exit;
     foreach ($marra as $knode => $node) {
         $new_node=array();
         $node_info=$node['@attributes'];
@@ -335,7 +394,7 @@ if (!$skipload) {
     $marra = null ; unset($marra);
     if(gc_enabled()) gc_collect_cycles();
 
-    // WAYS 
+    // WAYS
 
     logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
     $database->pdo->beginTransaction();
@@ -437,7 +496,7 @@ foreach($new_nodes as $k => $node) {
             default:
                 logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['osmid']));
                 print_r($node);
-                exit(1); 
+                exit(1);
                 break;
         }
     } elseif (isset($node['tags']['addr:street']) && !isset($node['tags']['highway'])) {
@@ -448,7 +507,7 @@ foreach($new_nodes as $k => $node) {
     }
 
     // echo PHP_EOL;
-    if(!isset($node['osmid']) && isset($node['name'])) { 
+    if(!isset($node['osmid']) && isset($node['name'])) {
     }
 }
 
@@ -528,7 +587,7 @@ $mod_nodes=array();
 logtrace(2,sprintf("[%s] - Have %s streets",__METHOD__,count($streets)));
 logtrace(2,sprintf("[%s] - Have %s addresses",__METHOD__,count($addresses)));
 
-if (!$streets) { 
+if (!$streets) {
     logtrace(3,sprintf("[%s] - Cant check as we have extracted no streets from xml",__METHOD__));
     exit;
 }
@@ -553,7 +612,7 @@ logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->er
 // select name from streets group by name order by name ascl
 // SELECT "name" FROM "streets" GROUP BY "name" ORDER BY "name ASC"
 
-$s = $database->select("streets", [ 
+$s = $database->select("streets", [
     "osmid",
     "name"
 ], [
@@ -565,8 +624,8 @@ $s = $database->select("streets", [
 // print_r(count($s));exit;
 
 logtrace(2,sprintf("[%s] - Selecting street list data",__METHOD__));
-if (isset($s)) { 
-    // asort($strt); 
+if (isset($s)) {
+    // asort($strt);
     foreach($s as $k => $v ) {
         logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v['name']));
     }
@@ -579,7 +638,7 @@ if (isset($s)) {
 function name_compare($a, $b) {
     $aname = $a['tags']['addr:street'];
     $bname = $b['tags']['addr:street'];
-    
+
     // Returns < 0 if str1 is less than str2; > 0 if str1 is greater than str2, and 0 if they are equal.
     $res = strcmp($aname, $bname);
     if ($res === 0) {
@@ -637,7 +696,7 @@ foreach($addresses as $k => $node) {
         exit;
     }
     // echo PHP_EOL;
-    //if(!isset($node['id']) && isset($node['name'])) 
+    //if(!isset($node['id']) && isset($node['name']))
     //logtrace(4,sprintf("[%s] - Parsing features ref '%s'",__METHOD__,$node['name']));
 
     /* Check name:fr + name:nl = name */
@@ -657,7 +716,7 @@ foreach($addresses as $k => $node) {
     //print_r($node);exit;
     }
 
-    if(isset($osm_id) && isset($node['tags']['addr:street'])) { 
+    if(isset($osm_id) && isset($node['tags']['addr:street'])) {
         logtrace(4,sprintf("[%s] - Check if street exists '%s'",__METHOD__,$node['tags']['addr:street']));
         $osm_info = search_street_node($node['tags']['addr:street'], $streets);
         // print_r($streets);
@@ -684,7 +743,7 @@ foreach($addresses as $k => $node) {
                     if(strpos($node['tags']['addr:street'], $my_street) !== false) {
                         // echo 'yes its in here';
                         $am_i_special=true;
-        
+
                         break;
                     }
                 }
@@ -730,7 +789,7 @@ foreach($addresses as $k => $node) {
                         } else {
                             logtrace(1,sprintf("[%s] - Verify Osm_id: [id:%s] - Missing matching street name - is street loaded ? - : '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
                             logtrace(3,sprintf("[%s] - Verify this in JOSM [id:%s] - This address might wrong, or the street isn't loaded or located at the edges of the data: '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
-                        }       
+                        }
                     }
                 }
             }
@@ -763,7 +822,7 @@ exit;
 $output="";
 // output
 foreach($mod_nodes as $k => $node) {
-/*  
+/*
    [148] => Array
         (
             [tags] => Array
@@ -841,7 +900,7 @@ function search_node($key, array &$arr){
     foreach($arr as $nodeid => $info) {
         if (isset($info['tags']['ref'])) {
             if ($info['tags']['ref']==$key) {
-                return($info); 
+                return($info);
             }
         }
     }
@@ -856,14 +915,14 @@ function search_street_node($key, array &$arr, $case_sensitive = true){
         if (isset($info['tags']['name'])) {
             if (!empty($case_sensitive)) {
                 if (strcmp($info['tags']['name'],$key)==0) {
-                    return($info); 
+                    return($info);
                 }
             } else {
                 $a=strtolower($info['tags']['name']);
                 $b=strtolower($key);
                 if (strcmp($a,$b)==0) {
                     logtrace(4,sprintf("[%s] - md5 check key/name :  %s vs %s ",__METHOD__, md5($a), md5($b)));
-                    return($info); 
+                    return($info);
                 }
             }
         }
@@ -873,12 +932,12 @@ function search_street_node($key, array &$arr, $case_sensitive = true){
 function search_street_node_deep($key, array &$arr, $singlename = false, $flipped = false, $lev = false){
     logtrace(5,sprintf("[%s] - Searching for name:nl/name:fr street in street ways %s .. ",__METHOD__,$key));
     // print_r($key);exit;
-    
+
     $reverse=0;
-    
+
     $data = preg_split('/ - /', $key, -1, PREG_SPLIT_NO_EMPTY);
 
-    if ($flipped) { 
+    if ($flipped) {
         if (count($data)==2) {
             // Flip
             $key=join(' - ', array_reverse($data));
@@ -893,7 +952,7 @@ function search_street_node_deep($key, array &$arr, $singlename = false, $flippe
 
     foreach($arr as $nodeid => $info) {
         $needle=' - ';
-        if ($singlename) { 
+        if ($singlename) {
             if (!strpos ( $info['tags']['name'], $needle )) {
                 $checkname=$info['tags']['name'] . ' - ' . $info['tags']['name'];
             } else  {
@@ -918,15 +977,15 @@ function search_street_node_deep($key, array &$arr, $singlename = false, $flippe
             } else {
                 $checkname=sprintf("%s - %s", $info['tags']['name:fr'], $info['tags']['name:nl']);
             }
-        } 
+        }
         */
 
-        if ($lev) { 
+        if ($lev) {
             $levenshtein = Levenshtein($checkname,$key);
             logtrace(5,sprintf("[%s] - Levenshtein distance %d : '%s' vs '%s'",__METHOD__,$levenshtein,$key, $checkname, $key));
             if ($levenshtein < 5) {
                 logtrace(4,sprintf("[%s] - (Levenshtein=%d) Minor differences detected between names  : '%s' vs '%s'",__METHOD__,$levenshtein,$key, $checkname, $key));
-                return($info); 
+                return($info);
             }
         }
 
@@ -934,7 +993,7 @@ function search_street_node_deep($key, array &$arr, $singlename = false, $flippe
             logtrace(4,sprintf("[%s] - new checkname '%s'",__METHOD__,$checkname));
             logtrace(4,sprintf("[%s] - checkname vs. key = '%s' vs '%s'",__METHOD__,$checkname, $key));
             if (strcmp($checkname,$key)==0) {
-                return($info); 
+                return($info);
             }
         }
     }
@@ -975,7 +1034,7 @@ function my_chomp(&$string) {
 
 function logtrace($level,$msg, $fg=null, $bg=null ) {
     global $verbose;
-    
+
 
     $DateTime=@date('Y-m-d H:i:s', time());
 
@@ -1015,7 +1074,7 @@ function logtrace($level,$msg, $fg=null, $bg=null ) {
         } else {
             echo $content;
         }
-        // "purple", "yellow" 
+        // "purple", "yellow"
         // "red", "black"
         // "cyan"
         $ok=0;
