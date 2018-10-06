@@ -1,5 +1,6 @@
 {
     "require": {
-        "catfan/Medoo": "^1.1"
+        "catfan/Medoo": "^1.1",
+        "gasparesganga/php-shapefile": "^2.4"
     }
 }
