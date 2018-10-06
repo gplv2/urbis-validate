@@ -29,7 +29,7 @@ $database_file='urbis.sqlite';
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
-$verbose=5;
+$verbose=3;
 
 // CONFIG STARTUP OPTIONS
 
