@@ -316,15 +316,18 @@ if (!$skipload) {
     } else {
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
     }
-    // Urbis street DB from shape file(s)
-    if ($database->query($schema_urbis) ) {
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-        $database->query($urbis_index1);
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-        $database->query($urbis_index2);
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
-    } else {
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+
+    if (isset($options['urbis']))  {
+        // Urbis street DB from shape file(s)
+        if ($database->query($schema_urbis) ) {
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            $database->query($urbis_index1);
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            $database->query($urbis_index2);
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        } else {
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        }
     }
     logtrace(2,sprintf("[%s] - Done",__METHOD__));
 
@@ -668,9 +671,10 @@ $s = $database->select("streets", [
 logtrace(2,sprintf("[%s] - Selecting street list data",__METHOD__));
 if (isset($s)) {
     // asort($strt);
+    logtrace(3,sprintf("[%s] - Checking against urbis street list database",__METHOD__));
     foreach($s as $k => $v ) {
         logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v['name']));
-        logtrace(3,sprintf("[%s] - Checking against urbis street list database",__METHOD__));
+        // Do query per street
         $us = $database->select("urbis_streets", [
             "name_fr",
             "name_nl",
@@ -679,11 +683,10 @@ if (isset($s)) {
             "name" => $v['name']
         ]);
         if (!empty($us)) {
-            logtrace(2,sprintf("[%s] - Found a match in URBIS for '%s'",__METHOD__,$us[0]['name']));
+            logtrace(4,sprintf("[%s] - Found a match in URBIS for '%s'",__METHOD__,$us[0]['name']));
             //
         } else {
             logtrace(2,sprintf("[%s] - Cannot find an URBIS match for '%s'",__METHOD__,$v['name']));
-            exit;
         }
     }
     logtrace(2,sprintf("[%s] - %d street names found",__METHOD__,count($s)));
