@@ -335,7 +335,7 @@ if (!$skipload) {
     if (isset($options['urbis']))  {
         try {
 
-            $sourcefiles = array( '/home/glenn/Downloads/urbis/shp/UrbAdm_STREET_SURFACE_LEVEL0.shp', '/home/glenn/Downloads/urbis/shp/UrbAdm_STREET_SURFACE_LEVEL_PLUS1.shp', '/home/glenn/Downloads/urbis/shp/UrbAdm_STREET_SURFACE_LEVEL_MINUS1.shp');
+            $sourcefiles = array( '/home/glenn/Downloads/urbisshp/UrbAdm_STREET_SURFACE_LEVEL0.shp', '/home/glenn/Downloads/urbisshp/UrbAdm_STREET_SURFACE_LEVEL_PLUS1.shp', '/home/glenn/Downloads/urbisshp/UrbAdm_STREET_SURFACE_LEVEL_MINUS1.shp');
 
             foreach ($sourcefiles as $f => $file) {
                 logtrace(2,sprintf("[%s] - Parsing shapefile %s",__METHOD__, $file));
@@ -531,13 +531,13 @@ foreach($new_nodes as $k => $node) {
     } elseif (!isset($node['tags']['addr:street']) && isset($node['tags']['highway']) && isset($node['tags']['name'])) {
         switch ($node['tags']['highway']) {
             case 'crossing':
-                continue;
+                //continue;
                 break;
             case 'bus_stop':
-                continue;
+                //continue;
                 break;
             case 'traffic_signals':
-                continue;
+                //continue;
                 break;
             default:
                 logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['osmid']));

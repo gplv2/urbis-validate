@@ -68,7 +68,7 @@ function cliargs_get_options($cliargs)
    for ($index=1; $index<$argc; $index+=1)
    {
       $currentarg = strtolower($argv[$index]);
-      $argparts = @split('=', $currentarg);
+      $argparts = @preg_split('/=/', $currentarg);
       $namepart = $argparts[0];
 
       if (cliargs_strstartswith($namepart, '--'))
