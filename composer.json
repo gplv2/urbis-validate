@@ -1,6 +1,6 @@
 {
     "require": {
-        "catfan/Medoo": "1.7.5",
-        "gasparesganga/php-shapefile": "^2.4"
+        "gasparesganga/php-shapefile": "^2.4",
+        "catfan/medoo": "^2.1"
     }
 }

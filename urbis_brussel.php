@@ -266,9 +266,9 @@ if (!$skipload) {
 
 $database = new Medoo\Medoo([
     'database_type' => 'sqlite',
-    'database_file' => $database_file
+    //'database_file' => $database_file
+    'database_name' => $database_file
 ]);
-
 
 // CHECK FOR INPUT FILE
 
@@ -306,31 +306,32 @@ if (!$skipload) {
     logtrace(2,sprintf("[%s] - Creating sqlite tables",__METHOD__));
 
     $database->query($schema_nodes);
-    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     $database->query($schema_ways);
-    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     if ($database->query($schema_streets) ) {
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
         $database->query($schema_indexes);
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     } else {
-        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     }
 
     if (isset($options['urbis']))  {
         // Urbis street DB from shape file(s)
         if ($database->query($schema_urbis) ) {
-            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
             $database->query($urbis_index1);
-            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
             $database->query($urbis_index2);
-            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
         } else {
-            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+            logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
         }
     }
     logtrace(2,sprintf("[%s] - Done",__METHOD__));
 
+    //exit;
     // Load urbis stuff in sqlite
     if (isset($options['urbis']))  {
         try {
@@ -380,7 +381,7 @@ if (!$skipload) {
                     $database->insert("urbis_streets", $ustreet);
                 }
                 // echo PHP_EOL;
-                logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+                logtrace(2,sprintf("[%s] - Commit ...",__METHOD__));
                 $database->pdo->commit();
 
             }
@@ -400,7 +401,6 @@ if (!$skipload) {
 
     $new_node=array();
     logtrace(2,sprintf("[%s] - Extracting xml formatted node data ",__METHOD__));
-    //print_r($marra);exit;
     foreach ($marra as $knode => $node) {
         $new_node=array();
         $node_info=$node['@attributes'];
@@ -425,18 +425,25 @@ if (!$skipload) {
                 logtrace(0,sprintf("[%s] - Error, empty tags, somethings isn't parsing well for node '%s'",__METHOD__,$node_info['id']));
                 exit;
             }
-            $new_node['(JSON)tags']=$node_tags;
+            $new_node['tags']=$node_tags;
         }
-        $new_node['(JSON)info']=$node_info;
-        //print_r($new_node); break;
-        $database->insert("nodes", $new_node);
+        $new_node['info']=$node_info;
+
+        //$database->beginDebug();
+
+        //try {
+            $database->insert("nodes", $new_node);
+        //} catch (InvalidArgumentException $e) {
+            //var_dump($database->debugLog());
+        //print_r($new_node); exit;
+        //}
         // echo PHP_EOL;
     }
-    logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+    logtrace(2,sprintf("[%s] - Commit ....",__METHOD__));
     $database->pdo->commit();
     logtrace(2,sprintf("[%s] - Done ",__METHOD__));
     // var_dump( $database->log() );
-    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     $marra = null ; unset($marra);
     if(gc_enabled()) gc_collect_cycles();
 
@@ -446,9 +453,11 @@ if (!$skipload) {
     $database->pdo->beginTransaction();
     $new_ways=array();
     logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
+    exit();
     foreach ($w_arra as $kway => $way) {
         $new_way=array();
         $way_info=$way['@attributes'];
+        print_r($way_info);exit();
         $new_way['osmid']=$way_info['id'];
         if(!isset($way_info)) {
             print_r($way);exit;
@@ -485,12 +494,19 @@ if (!$skipload) {
         $way_tags=array_combine($key, $val);
         $new_way['(JSON)info']=$way_info;
         $new_way['(JSON)tags']=$way_tags;
-        $database->insert("ways", $new_way);
+        //print_r($new_way);
+        try {
+            $database->beginDebug();
+            $database->insert("ways", $new_way);
+        } catch (InvalidArgumentException $e) {
+            var_dump($database->debugLog());
+        }
+
     }
-    logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+    logtrace(2,sprintf("[%s] - Commit .....",__METHOD__));
     $database->pdo->commit();
     logtrace(2,sprintf("[%s] - Done ",__METHOD__));
-    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     $w_arra = null ; unset($w_arra);
     unset($new_node);
     unset($new_way);
@@ -649,9 +665,9 @@ foreach($streets as $k => $v ) {
     $streetname = array ("osmid" => $v['osmid'], "name" => $strt );
     $database->insert("streets",$streetname);
 }
-logtrace(2,sprintf("[%s] - Commit ..",__METHOD__));
+logtrace(2,sprintf("[%s] - Commit ......",__METHOD__));
 $database->pdo->commit();
-logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error())));
+logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
 
 // print_r($strt);exit;
 

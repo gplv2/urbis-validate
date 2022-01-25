@@ -17,6 +17,10 @@ IT'S QUITE AMAZING THAT WITH ALL THE MONEY THROWN AT THESE DATABASES (3 IN TOTAL
 
 Install PHP first
 
+ - You'll need some php libraries like pdo-sqlite 
+ - It's quite insane but to parse a 300MB XML file, my system uses about 24GB of memory in the XML parser, which I honestly don't really understand why, but since you'll run out of PHP memory, it's best to create a temporary swapfile on your linux system.  Simple-xml doesn't seem to be so simple..
+
+
 There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
 
  - [v1](https://github.com/gplv2/urbis-validate/tree/v1): Fast as long as the xml isn't too huge, really big OSM files choke my laptop, so I needed a more memory friendly version
