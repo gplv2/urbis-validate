@@ -22,8 +22,11 @@ Install PHP first
 
 
     sudo fallocate -l 24G /swapfile
+
     chmod 600 /swapfile
+
     mkswap /swapfile
+
     swapon /swapfile
 
 There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
@@ -35,7 +38,7 @@ You can run this tool over a file you are editting in JOSM , my workflow goes li
  - fix the problem -> CTRL+S -> urbisvalidate -> fix problem , repeat.
 
 We need composer to use the db abstraction library:
-
+    
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     
 Then you need to install the requirements in your cloned folder
