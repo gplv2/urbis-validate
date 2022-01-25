@@ -266,9 +266,15 @@ if (!$skipload) {
 
 $database = new Medoo\Medoo([
     'database_type' => 'sqlite',
-    //'database_file' => $database_file
-    'database_name' => $database_file
+    'database_name' => $database_file,
+    'logging' => true,
+    'error' => PDO::ERRMODE_EXCEPTION,
+    'option' => [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
 ]);
+
+// test PDO EXCEPTIONS
+//$database->select("bccount", "*");
+
 
 // CHECK FOR INPUT FILE
 
@@ -425,23 +431,16 @@ if (!$skipload) {
                 logtrace(0,sprintf("[%s] - Error, empty tags, somethings isn't parsing well for node '%s'",__METHOD__,$node_info['id']));
                 exit;
             }
-            $new_node['tags']=$node_tags;
+            $new_node['tags']=json_encode($node_tags);
         }
-        $new_node['info']=$node_info;
+        $new_node['info']=json_encode($node_info);
 
-        //$database->beginDebug();
-
-        //try {
-            $database->insert("nodes", $new_node);
-        //} catch (InvalidArgumentException $e) {
-            //var_dump($database->debugLog());
-        //print_r($new_node); exit;
-        //}
+        $res = $database->insert("nodes", $new_node);
         // echo PHP_EOL;
     }
     logtrace(2,sprintf("[%s] - Commit ....",__METHOD__));
     $database->pdo->commit();
-    logtrace(2,sprintf("[%s] - Done ",__METHOD__));
+    logtrace(2,sprintf("[%s] - Done (%d)",__METHOD__, $res->rowCount()));
     // var_dump( $database->log() );
     logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     $marra = null ; unset($marra);
@@ -449,19 +448,20 @@ if (!$skipload) {
 
     // WAYS
 
-    logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
-    $database->pdo->beginTransaction();
-    $new_ways=array();
-    logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
-    exit();
-    foreach ($w_arra as $kway => $way) {
-        $new_way=array();
-        $way_info=$way['@attributes'];
-        print_r($way_info);exit();
-        $new_way['osmid']=$way_info['id'];
-        if(!isset($way_info)) {
-            print_r($way);exit;
-        }
+    try {
+        logtrace(2,sprintf("[%s] - Start transaction",__METHOD__));
+        $res = $database->pdo->beginTransaction();
+        $new_ways=array();
+        logtrace(2,sprintf("[%s] - Extracting xml formatted way data ",__METHOD__));
+
+        foreach ($w_arra as $kway => $way) {
+            $new_way=array();
+            $way_info=$way['@attributes'];
+            //print_r($way_info);exit();
+            $new_way['osmid']=$way_info['id'];
+            if(!isset($way_info)) {
+                print_r($way);exit;
+            }
         /*
            if(isset($way['@attributes'] )) {
         // This is probably a relation
@@ -470,43 +470,41 @@ if (!$skipload) {
 
         } else
          */
-        if (!isset($way['nd'])) {
-            //print_r($way);exit;
-            continue;
-        }
+            if (!isset($way['nd'])) {
+                //print_r($way);exit;
+                continue;
+            }
 
-        if (!isset($way['tag']) && count($way['nd'])) {
-            // No tags on this object but it has nodes , not interesting
-            // print_r($way);
-            continue;
-        }
+            if (!isset($way['tag']) && count($way['nd'])) {
+                // No tags on this object but it has nodes , not interesting
+                // print_r($way);
+                continue;
+            }
 
-        $key= array_value_recursive('k', $way['tag']);
-        $val= array_value_recursive('v', $way['tag']);
-        if (is_string($key)) {
-            $break=1;
-            // Only single key/val in this object
-            $key=array($key);
-            $val=array($val);
-            //print_r($key);
-            //print_r($val);
+            $key= array_value_recursive('k', $way['tag']);
+            $val= array_value_recursive('v', $way['tag']);
+            if (is_string($key)) {
+                $break=1;
+                // Only single key/val in this object
+                $key=array($key);
+                $val=array($val);
+                //print_r($key);
+                //print_r($val);
+            }
+            $way_tags=array_combine($key, $val);
+            $new_way['info']=json_encode($way_info);
+            $new_way['tags']=json_encode($way_tags);
+            $res = $database->insert("ways", $new_way);
+            //print_r($new_way); exit;
         }
-        $way_tags=array_combine($key, $val);
-        $new_way['(JSON)info']=$way_info;
-        $new_way['(JSON)tags']=$way_tags;
-        //print_r($new_way);
-        try {
-            $database->beginDebug();
-            $database->insert("ways", $new_way);
-        } catch (InvalidArgumentException $e) {
-            var_dump($database->debugLog());
-        }
-
+        logtrace(2,sprintf("[%s] - Commit .....",__METHOD__));
+        $database->pdo->commit();
+    } catch (PDOException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
-    logtrace(2,sprintf("[%s] - Commit .....",__METHOD__));
-    $database->pdo->commit();
-    logtrace(2,sprintf("[%s] - Done ",__METHOD__));
-    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
+
+    logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->errorInfo)));
+    logtrace(2,sprintf("[%s] - Done (%d)",__METHOD__, $res->rowCount()));
     $w_arra = null ; unset($w_arra);
     unset($new_node);
     unset($new_way);
@@ -586,6 +584,7 @@ $new_ways = $database->select("ways", [
 ]/* ,[ "LIMIT" => 200 ] */);
 
 
+//print_r($new_ways);exit;
 // GET WAY ADDRESS DATA FROM SQLITE
 
 $streets = array();
@@ -594,6 +593,7 @@ logtrace(2,sprintf("[%s] - Parsing address data from table 'ways'",__METHOD__));
 foreach($new_ways as $k => $way) {
     $way['tags']=json_decode($way['tags'], true);
     $way['info']=json_decode($way['info'], true);
+    //print_r($way);exit;
     if (!isset($way['tags'])) {
         logtrace(4,sprintf("[%s] - skipping empty tag way '%s'",__METHOD__,$way['osmid']));
         if (empty($way['osmid'])) {
@@ -602,6 +602,7 @@ foreach($new_ways as $k => $way) {
         }
         continue;
     }
+
     if (!isset($way['tags']['addr:street']) && isset($way['tags']['highway']) && isset($way['tags']['name'])) {
         // way is a street with a name (should exist for ways, we need this)
         logtrace(3,sprintf("[%s] - way has data with name '%s' - %s",__METHOD__,$way['osmid'], $way['tags']['name']));
@@ -663,25 +664,36 @@ foreach($streets as $k => $v ) {
     // print_r($v);exit;
     $strt=$v['tags']['name'];
     $streetname = array ("osmid" => $v['osmid'], "name" => $strt );
-    $database->insert("streets",$streetname);
+    $res = $database->insert("streets",$streetname);
 }
 logtrace(2,sprintf("[%s] - Commit ......",__METHOD__));
 $database->pdo->commit();
+logtrace(2,sprintf("[%s] - Done (%d)",__METHOD__, $res->rowCount()));
 logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
 
-// print_r($strt);exit;
+// $database->beginDebug();
 
-// select name from streets group by name order by name ascl
-// SELECT "name" FROM "streets" GROUP BY "name" ORDER BY "name ASC"
+try {
+    $s = $database->select("streets", [
+        'osmid',
+        'name'
+    ], [
+        'GROUP' => 'name',
+        'ORDER' => ['name' => 'ASC']
+    ]);
+} catch (Exception $e) {
+    print_r($e);
+    exit;
+}
 
-$s = $database->select("streets", [
-    "osmid",
-    "name"
-], [
-    "GROUP" => "name",
-    "ORDER" => "name ASC"
-]);
+//var_dump($database->error);
+//var_dump($database->errorInfo);
 
+//var_dump($database->debugLog());
+//exit;
+
+//var_dump($database->debugLog());
+//var_dump($s);exit;
 
 // print_r(count($s));exit;
 logtrace(2,sprintf("[%s] - Selecting street list data",__METHOD__));
@@ -689,6 +701,7 @@ if (isset($s)) {
     // asort($strt);
     logtrace(3,sprintf("[%s] - Checking against urbis street list database",__METHOD__));
     foreach($s as $k => $v ) {
+        //exit;
         logtrace(3,sprintf("[%s] - street '%s'",__METHOD__,$v['name']));
         // Do query per street
         $us = $database->select("urbis_streets", [
