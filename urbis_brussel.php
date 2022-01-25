@@ -809,7 +809,7 @@ foreach($addresses as $k => $node) {
     }
 
     if(isset($osm_id) && isset($node['tags']['addr:street'])) {
-        logtrace(4,sprintf("[%s] - Check if street exists '%s'",__METHOD__,$node['tags']['addr:street']));
+        logtrace(5,sprintf("[%s] - Check if street exists '%s'",__METHOD__,$node['tags']['addr:street']));
         $osm_info = search_street_node($node['tags']['addr:street'], $streets);
         // print_r($streets);
         if (count($osm_info)) {
