@@ -29,7 +29,7 @@ $database_file='urbis.sqlite';
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
-$verbose=3;
+$verbose=5;
 
 // CONFIG STARTUP OPTIONS
 
@@ -553,8 +553,11 @@ foreach($new_nodes as $k => $node) {
             case 'traffic_signals':
                 //continue;
                 break;
+            case 'turning_circle':
+                //continue;
+                break;
             default:
-                logtrace(4,sprintf("[%s] - node is street with a name and should not exist: '%s'",__METHOD__,$node['osmid']));
+                logtrace(4,sprintf("[%s] - node is highway with a name and should not exist: '%s'",__METHOD__,$node['osmid']));
                 print_r($node);
                 exit(1);
                 break;
@@ -585,9 +588,7 @@ $new_ways = $database->select("ways", [
 ]/* ,[ "LIMIT" => 200 ] */);
 
 
-//print_r($new_ways);exit;
 // GET WAY ADDRESS DATA FROM SQLITE
-
 $streets = array();
 // Extract addresses / aka streets from ways
 logtrace(2,sprintf("[%s] - Parsing address data from table 'ways'",__METHOD__));
