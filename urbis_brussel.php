@@ -29,7 +29,7 @@ $database_file='urbis.sqlite';
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
-$verbose=4;
+$verbose=3;
 
 // CONFIG STARTUP OPTIONS
 
@@ -68,10 +68,14 @@ $cliargs= array(
          'type' => 'optional',
          'description' => "The name of the output extension (json, geojson, osm).",
          'default' => ''
+         ),
+      'verbose' => array(
+         'short' => 'v',
+         'type' => 'optional',
+         'description' => "Verbose level reporting, default 3",
+         'default' => 3
          )
       );
-
-// TEMPLATES
 
 
 $osm_template=<<<EOD
@@ -146,6 +150,16 @@ PRIMARY KEY (osmid) ON CONFLICT REPLACE
 );
 EOD;
 
+$schema_problem_streets=<<<EOD
+CREATE TABLE problem_streets (
+rowid INTEGER PRIMARY KEY AUTOINCREMENT,
+osm_id,
+name NOT NULL,
+count INTEGER DEFAULT 1,
+CONSTRAINT con_name UNIQUE(name)
+);
+EOD;
+
 $schema_urbis=<<<EOD
 CREATE TABLE urbis_streets (
 name_fr NULL NOT NULL,
@@ -171,6 +185,12 @@ $schema_indexes=<<<EOD
 CREATE INDEX idx_name ON streets(name);
 EOD;
 
+$schema_problem_indexes=<<<EOD
+CREATE INDEX idx_ps_name ON streets(name);
+EOD;
+
+/* command line errors are thrown hereafter */
+
 /* command line errors are thrown hereafter */
 $options = cliargs_get_options($cliargs);
 
@@ -185,6 +205,8 @@ if (isset($options['format'])) { $output  = trim($options['format']); } else { u
 if (isset($options['skipload'])) { $skipload = true; } else { $skipload = false; }
 if (isset($options['changefile'])) { $changefile = trim($options['changefile']); } else { unset($changefile); }
 if (isset($options['urbis'])) { $urbis= $osm = 1 ; } else { unset($urbis); }
+// Override default verbose level
+if (isset($options['verbose'])) { $verbose  = trim($options['verbose']); }
 
 if (empty($changefile)) {
     unset($changefile);
@@ -275,7 +297,6 @@ $database = new Medoo\Medoo([
 // test PDO EXCEPTIONS
 //$database->select("bccount", "*");
 
-
 // CHECK FOR INPUT FILE
 
 if (!file_exists($osmfile)) { die("File $osmfile not found"); }
@@ -315,9 +336,18 @@ if (!$skipload) {
     logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     $database->query($schema_ways);
     logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
+
     if ($database->query($schema_streets) ) {
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
         $database->query($schema_indexes);
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
+    } else {
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
+    }
+
+    if ($database->query($schema_problem_streets) ) {
+        logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
+        $database->query($schema_problem_indexes);
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
     } else {
         logtrace(2,sprintf("[%s] - DB response %s",__METHOD__, json_encode($database->error)));
@@ -877,6 +907,27 @@ foreach($addresses as $k => $node) {
                                 logtrace(2,sprintf("[%s] - Found a street with double/dubious names.  This is a street that has 2 names in atleast 1 language or municipality.  '%s' [id: %d] vs. '%s' [id: %d]. (Dont just 'fix' the names without research)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
                             } else {
                                 logtrace(2,sprintf("[%s] - Found deep scan match (levenshtein) '%s' [id: %d] vs. '%s' [id: %d]. (Fix the minor spell differences)",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+                                // Avenue Émile Van Becelaere - Émile Van Becelaerelaan //FIXME
+                                //
+                                // ON CONFLICT(name) DO UPDATE SET count = count + 1;
+                                //
+
+				//$ps_id = $database->quote($osm_info['info']['id']);
+				$ps_id = $osm_info['info']['id'];
+				$ps_name = $database->quote($osm_info['tags']['name']);
+
+				//$ps_id = $osm_info['info']['id'];
+				//$ps_name = $osm_info['tags']['name'];
+
+				//print_r($ps_id);
+				//print_r($ps_name);
+				//exit;
+
+                                $database->pdo->beginTransaction();
+                                logtrace(6,sprintf("[%s] - Start transaction",__METHOD__));
+                                $database->query(sprintf("INSERT INTO problem_streets (osm_id,name) VALUES (%d, %s) ON CONFLICT (name) DO UPDATE SET count = count + 1", $ps_id, $ps_name));
+                                $database->pdo->commit();
+				//var_dump($database->debugLog());
                             }
                         } else {
                             logtrace(1,sprintf("[%s] - Verify Osm_id: [id: %s] - Missing matching street name - is street loaded ? - : '%s'",__METHOD__,$osm_id, $node['tags']['addr:street']));
