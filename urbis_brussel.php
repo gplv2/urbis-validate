@@ -29,7 +29,7 @@ $database_file='urbis.sqlite';
 // require_once('class.colors.php');
 // require_once('GeoCalc.class.php');
 
-$verbose=5;
+$verbose=4;
 
 // CONFIG STARTUP OPTIONS
 
@@ -1035,7 +1035,7 @@ function search_street_node_deep($key, array &$arr, $singlename = false, $flippe
             $key=join(' - ', array_reverse($data));
             // print_r($data);
             if(strcmp($data[0],$data[1])==0) {
-                logtrace(4,sprintf("[%s] - Both languages of addr:street source are the same '%s' (split at - )",__METHOD__,$key));
+                logtrace(5,sprintf("[%s] - Both languages of addr:street source are the same '%s' (split at - )",__METHOD__,$key));
             } else {
                 logtrace(4,sprintf("[%s] - Flipped key %s .. ",__METHOD__,$key));
             }
