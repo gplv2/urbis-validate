@@ -535,7 +535,7 @@ foreach($new_nodes as $k => $node) {
     $node['info']=json_decode($node['info'], true);
 
     if (!isset($node['tags'])) {
-        logtrace(4,sprintf("[%s] - skipping empty tag node '%s'",__METHOD__,$node['osmid']));
+        logtrace(5,sprintf("[%s] - skipping empty tag node '%s'",__METHOD__,$node['osmid']));
         if (empty($node['osmid'])) {
             print_r($node);
             exit;
@@ -909,7 +909,7 @@ foreach($addresses as $k => $node) {
 }
 
 logtrace(1,sprintf("[%s] - Done",__METHOD__));
-exit;
+//exit;
 
 $output="";
 // output
