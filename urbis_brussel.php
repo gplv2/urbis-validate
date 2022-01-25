@@ -780,7 +780,7 @@ logtrace(2,sprintf("[%s] - Validating address data",__METHOD__));
 $cnt=0;
 foreach($addresses as $k => $node) {
     //print_r($node);exit;
-    logtrace(4,sprintf("[%s] - Checking address %s",__METHOD__,$k));
+    logtrace(5,sprintf("[%s] - Checking address %s",__METHOD__,$k));
     if(isset($node['info']['id'])) {
         $osm_id=$node['info']['id'];
     } else {
@@ -1082,8 +1082,8 @@ function search_street_node_deep($key, array &$arr, $singlename = false, $flippe
         }
 
         if (strlen($checkname)) {
-            logtrace(4,sprintf("[%s] - new checkname '%s'",__METHOD__,$checkname));
-            logtrace(4,sprintf("[%s] - checkname vs. key = '%s' vs '%s'",__METHOD__,$checkname, $key));
+            logtrace(5,sprintf("[%s] - new checkname '%s'",__METHOD__,$checkname));
+            logtrace(5,sprintf("[%s] - checkname vs. key = '%s' vs '%s'",__METHOD__,$checkname, $key));
             if (strcmp($checkname,$key)==0) {
                 return($info);
             }
