@@ -21,12 +21,11 @@ Install PHP first
  - It's quite insane but to parse a 300MB XML file, my system uses about 24GB of memory in the XML parser, which I honestly don't really understand why, but since you'll run out of PHP memory, it's best to create a temporary swapfile on your linux system.  Simple-xml doesn't seem to be so simple..
 
 
+## swapfile
+
     sudo fallocate -l 24G /swapfile
-
     chmod 600 /swapfile
-
     mkswap /swapfile
-
     swapon /swapfile
 
 There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
