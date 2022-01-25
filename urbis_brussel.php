@@ -572,6 +572,7 @@ foreach($new_nodes as $k => $node) {
 }
 
 // Sleep 1 - Laptop getting hot on huge files
+logtrace(4,sprintf("[%s] - Sleep a second ",__METHOD__));
 sleep(1);
 
 $new_nodes = null ; unset($new_nodes);
@@ -597,6 +598,7 @@ foreach($new_ways as $k => $way) {
     if (!isset($way['tags'])) {
         logtrace(4,sprintf("[%s] - skipping empty tag way '%s'",__METHOD__,$way['osmid']));
         if (empty($way['osmid'])) {
+            logtrace(4,sprintf("[%s] - Empty way problem '%s'",__METHOD__,$way['osmid']));
             print_r($way);
             exit;
         }

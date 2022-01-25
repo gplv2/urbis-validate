@@ -28,10 +28,25 @@ Install PHP first
     mkswap /swapfile
     swapon /swapfile
 
+## what you for sure need
+ - A copy of the Urbis shape files (It needs 3 files and the path is hardcoded in this tool out of lazyness)
+ - an extract from either overpass or via JOSM
+
+The tool will extract all the streetnames from the Urbis datafiles rather quickly, much better than the time and amount of memory it needs to read the damn XML OSM files
+What it will do it will match all name:\* Fields from the XML to the extracted list from Urbis.   But the big problem here is of course the correct spelling in URBIS.   I will compensate for this soon so it becomes usefull again in the future.  Writing a change file (that you can push to OSM servers using JOSM) is tricky and there could be errors, even though I tested this stuff well, since I'm trusting the data from OSM to be somewhat coherent it works so far.  But nasty stuff or characters can be inserted and this tool might choke on it.
+
+It will construct the sqlite database automatically, the schema is present in the code, it will remove/rebuild the sqlite database like this:
+
+    ./urbis_brussel.php -u -o exportoverpass.xml
+
+You can skipp it the second time using -s flag
+
 There are 2 versions of this tool, the first attempt which loads plenty of stuff in memory and doesn't let go easily.  The other version will use an sqlite file to store nodes/ways and street information.  It's more optimised for analysing purposes.
 
  - [v1](https://github.com/gplv2/urbis-validate/tree/v1): Fast as long as the xml isn't too huge, really big OSM files choke my laptop, so I needed a more memory friendly version
  - [v2](https://github.com/gplv2/urbis-validate/tree/v2): Uses sqlite, you need 'pdo_sqlite' libs.  (added -s switch to skip reloading xml, for dev reasons mostly)
+
+I noticed that even the sqlite version doesn't do well on the memory , so the v2 is always what you want.  The master branch uses it
 
 You can run this tool over a file you are editting in JOSM , my workflow goes like this:
  - fix the problem -> CTRL+S -> urbisvalidate -> fix problem , repeat.
