@@ -813,7 +813,7 @@ foreach($addresses as $k => $node) {
         $osm_info = search_street_node($node['tags']['addr:street'], $streets);
         // print_r($streets);
         if (count($osm_info)) {
-            logtrace(3,sprintf("[%s] - Found matching OSM data for street (min 1 highway) '%s' [id: %d] vs. '%s' [id: %d]",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
+            logtrace(5,sprintf("[%s] - Found matching OSM data for street (min 1 highway) '%s' [id: %d] vs. '%s' [id: %d]",__METHOD__,$node['tags']['addr:street'], $osm_id, $osm_info['tags']['name'], $osm_info['info']['id']));
         //print_r($osm_info);exit;
             //print_r($osm_info);
             //print_r($node);exit;
